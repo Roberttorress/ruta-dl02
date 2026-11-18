@@ -1,6 +1,6 @@
 'use strict';
 /* ===== data (injected) ===== */
-const BUILD='6cddde65',_D=window.__D;function dec(a){const o=[];let x=0,y=0;for(let k=0;k<a.length;k+=2){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5])}return o}const DAYS=_D.days.map(d=>{d.coords=dec(d.c);delete d.c;return d}),MERC=_D.merc,NT=_D.NT,OUTER=dec(_D.outer);const SECS=_D.secs.map(x=>{x.rings=x.r.map(dec);delete x.r;return x});const SEG=(()=>{const a=_D.seg,o=[];let x=0,y=0;for(let k=0;k<a.length;k+=4){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5,(x+a[k+2])/1e5,(y+a[k+3])/1e5])}return o})();delete window.__D;
+const BUILD='8f776339',_D=window.__D;function dec(a){const o=[];let x=0,y=0;for(let k=0;k<a.length;k+=2){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5])}return o}const DAYS=_D.days.map(d=>{d.coords=dec(d.c);delete d.c;return d}),MERC=_D.merc,NT=_D.NT,OUTER=dec(_D.outer);const SECS=_D.secs.map(x=>{x.rings=x.r.map(dec);delete x.r;return x});const SEG=(()=>{const a=_D.seg,o=[];let x=0,y=0;for(let k=0;k<a.length;k+=4){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5,(x+a[k+2])/1e5,(y+a[k+3])/1e5])}return o})();delete window.__D;
 const DIAD='2027-06-06';
 const FN={1:'Fase 1 · Zona a favor',2:'Fase 2 · Zonas en empate',3:'Fase 3 · Zonas por recuperar'},CM={1:'#0d3b8c',2:'#b58900',3:'#e0761a'};
 const CAT={'Bastión':{c:'#0d3b8c',n:'Zona fuerte a favor'},'Defender':{c:'#4f86d6',n:'Zona a favor'},'Empate':{c:'#f2c200',n:'Zona en empate'},'Recuperable':{c:'#f08a1d',n:'Zona por recuperar'},'Adverso':{c:'#9e9e9e',n:'Zona no prioritaria'}};
@@ -23,7 +23,7 @@ let saveT=null;function save(now){clearTimeout(saveT);const w=()=>{try{localStor
 const dk=d=>'d'+d.dia,dd=d=>S.days[dk(d)]||{};
 /* ===== gate ===== */
 (function(){let ok=false;try{ok=localStorage.getItem('dl02_ok')==='1'}catch(e){}const g=$('gate');if(ok){g.remove();return}
- const go=()=>{if($('pin').value==='2027'){try{localStorage.setItem('dl02_ok','1')}catch(e){}g.remove();resize()}else{$('pinerr').textContent='Clave incorrecta';$('pin').value=''}};
+ const go=()=>{if($('pin').value==='2027'){try{localStorage.setItem('dl02_ok','1')}catch(e){}g.remove();setTimeout(()=>{resize();fitBounds(OUTER,.05)},50)}else{$('pinerr').textContent='Clave incorrecta';$('pin').value=''}};
  $('pinb').onclick=go;$('pin').onkeydown=e=>{if(e.key==='Enter')go()}})();
 /* ===== geo ===== */
 const KX=111320*Math.cos(25.74*Math.PI/180),KY=110574;
@@ -297,5 +297,5 @@ function rCap(){const p=S.caps.filter(c=>c.k==='Petición'),n=st=>p.filter(c=>c.
 /* ===== boot ===== */
 window.addEventListener('online',()=>{useTiles=true;tileFail=0;reqDraw()});window.addEventListener('offline',()=>{useTiles=false;reqDraw()});
 document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')$('modal').style.display='none'});
-applyHC();resize();fitBounds(OUTER,.05);render();$('gst').textContent=useTiles?'Toca ◎ para ver dónde estás':'Sin internet: calles guardadas';
+applyHC();resize();fitBounds(OUTER,.05);render();requestAnimationFrame(()=>{resize();if(!cur)fitBounds(OUTER,.05)});setTimeout(()=>{resize();if(!cur&&!follow)fitBounds(OUTER,.05)},400);$('gst').textContent=useTiles?'Toca ◎ para ver dónde estás':'Sin internet: calles guardadas';
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').then(r=>{r.addEventListener('updatefound',()=>{const w=r.installing;w&&w.addEventListener('statechange',()=>{if(w.state==='installed'&&navigator.serviceWorker.controller)toast('🔄 Nueva versión lista · toca para actualizar',15000,()=>location.reload())})})}).catch(()=>{});
