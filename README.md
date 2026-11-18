@@ -1,2 +1,2 @@
-# Ruta DL02
+# DL02
 App de campo para recorridos.
