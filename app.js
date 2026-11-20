@@ -1,6 +1,6 @@
 'use strict';
 /* ===== data (injected) ===== */
-const BUILD='06d498b2',_D=window.__D;function dec(a){const o=[];let x=0,y=0;for(let k=0;k<a.length;k+=2){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5])}return o}const DAYS=_D.days.map(d=>{d.coords=dec(d.c);delete d.c;return d}),MERC=_D.merc,NT=_D.NT,OUTER=dec(_D.outer);const SECS=_D.secs.map(x=>{x.rings=x.r.map(dec);delete x.r;return x});const SEG=(()=>{const a=_D.seg,o=[];let x=0,y=0;for(let k=0;k<a.length;k+=4){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5,(x+a[k+2])/1e5,(y+a[k+3])/1e5])}return o})();delete window.__D;
+const BUILD='84c01039',_D=window.__D;function dec(a){const o=[];let x=0,y=0;for(let k=0;k<a.length;k+=2){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5])}return o}const DAYS=_D.days.map(d=>{d.coords=dec(d.c);delete d.c;return d}),MERC=_D.merc,NT=_D.NT,OUTER=dec(_D.outer);const SECS=_D.secs.map(x=>{x.rings=x.r.map(dec);delete x.r;return x});const SEG=(()=>{const a=_D.seg,o=[];let x=0,y=0;for(let k=0;k<a.length;k+=4){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5,(x+a[k+2])/1e5,(y+a[k+3])/1e5])}return o})();delete window.__D;
 const DIAD='2027-06-06';
 const FN={1:'Fase 1 · Zona a favor',2:'Fase 2 · Zonas en empate',3:'Fase 3 · Zonas por recuperar'},CM={1:'#0d3b8c',2:'#b58900',3:'#e0761a'};
 const CAT={'Bastión':{c:'#0d3b8c',n:'Zona fuerte a favor'},'Defender':{c:'#4f86d6',n:'Zona a favor'},'Empate':{c:'#f2c200',n:'Zona en empate'},'Recuperable':{c:'#f08a1d',n:'Zona por recuperar'},'Adverso':{c:'#9e9e9e',n:'Zona no prioritaria'}};
@@ -109,7 +109,10 @@ function tap(px,py){const r=cv.getBoundingClientRect(),x=px-r.left,y=py-r.top;
  if(view.z>=14){const hit=S.caps.find(k=>k.lon&&Math.hypot(proj(k.lon,k.lat)[0]-x,proj(k.lon,k.lat)[1]-y)<16);if(hit){openPet(hit);return}}
  const [lo,la]=unproj(x,y);sel=secAt(lo,la)||null;showPop(sel);reqDraw()}
 function showPop(x){const p=$('pop');if(!x){p.style.display='none';return}const st=secStats(x.s);p.style.display='block';
- p.innerHTML='<div class="row" style="justify-content:space-between"><b>Sección '+pad(x.s)+'</b><button class="x" onclick="$(\'pop\').style.display=\'none\'">✕</button></div><span class="sem" style="background:'+CAT[x.cat].c+'"></span>'+CAT[x.cat].n+'<br>'+fmt(x.ln)+' personas con credencial<br>Meta 2027: <b>'+fmt(x.meta)+'</b> votos ('+fmt(x.fyc)+' en 2024, <b>faltan '+fmt(x.delta)+'</b>)'+(st.fav?'<br>👍 '+st.fav+' a favor identificados':'')+(st.pets?'<br>🙋 '+st.pets+' peticiones':'')+'<br><small class="mut">'+esc(x.col)+'</small>'}
+ const T=x.tot||1,R=[['Fuerza y Corazón (PAN-PRI-PRD)',x.fyc,'#1f5fbf','PAN '+fmt(x.pan)+' · PRI '+fmt(x.pri)+' · PRD y combinaciones '+fmt(Math.max(0,x.fyc-x.pan-x.pri))],['Movimiento Ciudadano',x.mc,'#f08a1d'],['Morena',x.mo,'#a1252b'],['PT',x.pt,'#d4242b'],['VIDA',x.vi,'#7b4fa0'],['PVEM',x.pv,'#2e9d4f'],['Otros (ESO, PL, PES, PJ)',x.ot,'#9e9e9e'],['Nulos y no registrados',x.nu,'#c7c7c7']].filter(r=>r[1]).sort((a,b)=>b[1]-a[1]);
+ p.innerHTML='<div class="row" style="justify-content:space-between"><b>Sección '+pad(x.s)+'</b><button class="x" onclick="$(\'pop\').style.display=\'none\'">✕</button></div><div><span class="sem" style="background:'+CAT[x.cat].c+'"></span>'+CAT[x.cat].n+' · Meta 2027: <b>'+fmt(x.meta)+'</b> (faltan <b>'+fmt(x.delta)+'</b>)</div>'+
+ '<div class="vr-h">Diputación local 2024 · votos por partido</div>'+R.map(r=>'<div class="vr"><div class="vr-t"><span>'+r[0]+'</span><b>'+fmt(r[1])+' <span class="mut">'+(100*r[1]/T).toFixed(1)+'%</span></b></div><div class="vr-b"><i style="width:'+(100*r[1]/T)+'%;background:'+r[2]+'"></i></div>'+(r[3]?'<div class="vr-s">'+r[3]+'</div>':'')+'</div>').join('')+
+ '<div class="vr-f">'+fmt(x.tot)+' votos · participación '+x.pa+'% de '+fmt(x.ln)+' con credencial</div>'+(st.fav||st.pets?'<div class="vr-f">'+(st.fav?'👍 '+st.fav+' a favor identificados ':'')+(st.pets?'🙋 '+st.pets+' peticiones':'')+'</div>':'')}
 /* ===== stats ===== */
 function secStats(s){const t=S.tally.filter(x=>x.sec===s&&!x.test);const c={fav:0,ind:0,con:0,na:0};t.forEach(x=>c[x.r]++);c.doors=t.length;c.pets=S.caps.filter(k=>k.k==='Petición'&&k.sec===s&&!k.test).length;return c}
 function topCats(secs){const m={};S.caps.forEach(k=>{if(k.k==='Petición'&&secs.includes(k.sec))m[k.cat]=(m[k.cat]||0)+1});return Object.entries(m).sort((a,b)=>b[1]-a[1])}
@@ -446,6 +449,9 @@ new MutationObserver(()=>{const m=$('modal');if(m.classList.contains('closing'))
 const TORD=['hoy','cal','dd','av','cap','mas'];let _lt=null,_lc=null;
 function animIn(el,cls){if(RM())return;el.classList.remove('inR','inL','inF');void el.offsetWidth;el.classList.add(cls)}
 function tabAnim(){let c=null;if(_lt!==null&&_lt!==tab)c=TORD.indexOf(tab)>TORD.indexOf(_lt)?'inR':'inL';else if(_lt===tab&&tab==='hoy'&&_lc!==cur)c=cur?'inR':'inL';_lt=tab;_lc=cur;if(c)animIn(panel,c)}
+
+/* Davidsito se esconde mientras la tarjeta de sección está abierta */
+(function(){const p=$('pop');if(!p)return;new MutationObserver(()=>document.body.classList.toggle('popopen',p.style.display==='block')).observe(p,{attributes:true,attributeFilter:['style']})})();
 
 /* ===== Día D ===== */
 S.dd=S.dd||{};S.dd.c=S.dd.c||{};S.dd.ck=S.dd.ck||{};S.dd.cfg=S.dd.cfg||{};
