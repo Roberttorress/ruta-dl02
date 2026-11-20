@@ -1,6 +1,6 @@
 'use strict';
 /* ===== data (injected) ===== */
-const BUILD='417c5c61',_D=window.__D;function dec(a){const o=[];let x=0,y=0;for(let k=0;k<a.length;k+=2){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5])}return o}const DAYS=_D.days.map(d=>{d.coords=dec(d.c);delete d.c;return d}),MERC=_D.merc,NT=_D.NT,OUTER=dec(_D.outer);const SECS=_D.secs.map(x=>{x.rings=x.r.map(dec);delete x.r;return x});const SEG=(()=>{const a=_D.seg,o=[];let x=0,y=0;for(let k=0;k<a.length;k+=4){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5,(x+a[k+2])/1e5,(y+a[k+3])/1e5])}return o})();delete window.__D;
+const BUILD='06d498b2',_D=window.__D;function dec(a){const o=[];let x=0,y=0;for(let k=0;k<a.length;k+=2){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5])}return o}const DAYS=_D.days.map(d=>{d.coords=dec(d.c);delete d.c;return d}),MERC=_D.merc,NT=_D.NT,OUTER=dec(_D.outer);const SECS=_D.secs.map(x=>{x.rings=x.r.map(dec);delete x.r;return x});const SEG=(()=>{const a=_D.seg,o=[];let x=0,y=0;for(let k=0;k<a.length;k+=4){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5,(x+a[k+2])/1e5,(y+a[k+3])/1e5])}return o})();delete window.__D;
 const DIAD='2027-06-06';
 const FN={1:'Fase 1 · Zona a favor',2:'Fase 2 · Zonas en empate',3:'Fase 3 · Zonas por recuperar'},CM={1:'#0d3b8c',2:'#b58900',3:'#e0761a'};
 const CAT={'Bastión':{c:'#0d3b8c',n:'Zona fuerte a favor'},'Defender':{c:'#4f86d6',n:'Zona a favor'},'Empate':{c:'#f2c200',n:'Zona en empate'},'Recuperable':{c:'#f08a1d',n:'Zona por recuperar'},'Adverso':{c:'#9e9e9e',n:'Zona no prioritaria'}};
@@ -632,7 +632,7 @@ function fzAlerts(){const t=todayIso(),A=[],E=fzEvents();
  return A}
 function alertBox(A){if(!A.length)return '<div class="card" style="border-color:var(--ok)"><b style="color:var(--ok)">✔ Todo en regla con fiscalización</b></div>';return '<div class="card" style="border-color:'+(A.some(a=>a.l==='r')?'#b3261e':'#b58900')+'"><b>Cumplimiento INE</b>'+A.map(a=>'<div class="fzal" data-go="'+a.go+'" style="margin:6px 0;cursor:pointer;color:'+(a.l==='r'?'#b3261e':'inherit')+'">'+(a.l==='r'?'🔴 ':'🟠 ')+esc(a.t)+' ›</div>').join('')+'</div>'}
 function agSegH(){return '<h1>Agenda</h1><div class="chips">'+[['rec','🚶 Recorridos'],['ev','📅 Eventos y SIF'],['g','💰 Gastos y tope'],['cfg','⚙️ Ajustes']].map(a=>'<button data-ag="'+a[0]+'" class="'+(agSeg===a[0]?'on':'')+'">'+a[1]+'</button>').join('')+'</div>'}
-function rAg(){if(agSeg==='rec'){rCal();const h1=panel.querySelector('h1');if(h1)h1.remove();panel.insertAdjacentHTML('afterbegin',agSegH());bindAg();return}
+function rAg(){if(agSeg==='rec'){rCal();const h1=panel.querySelector('h1');if(h1)h1.remove();const dz=panel.querySelector('.diad');if(dz)dz.remove();panel.insertAdjacentHTML('afterbegin',agSegH());bindAg();return}
  let h=agSegH();const t=todayIso();
  if(agSeg==='ev'){const E=fzEvents(),A=fzAlerts();h+=alertBox(A.filter(a=>a.go.indexOf('ev')===0));
   const mon=(()=>{const d=new Date(t+'T12:00:00');const k=(8-d.getDay())%7;return addD(t,d.getDay()===1?0:k)})();
