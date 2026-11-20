@@ -1,6 +1,6 @@
 'use strict';
 /* ===== data (injected) ===== */
-const BUILD='09476b6d',_D=window.__D;function dec(a){const o=[];let x=0,y=0;for(let k=0;k<a.length;k+=2){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5])}return o}const DAYS=_D.days.map(d=>{d.coords=dec(d.c);delete d.c;return d}),MERC=_D.merc,NT=_D.NT,OUTER=dec(_D.outer);const SECS=_D.secs.map(x=>{x.rings=x.r.map(dec);delete x.r;return x});const SEG=(()=>{const a=_D.seg,o=[];let x=0,y=0;for(let k=0;k<a.length;k+=4){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5,(x+a[k+2])/1e5,(y+a[k+3])/1e5])}return o})();delete window.__D;
+const BUILD='68a48cb8',_D=window.__D;function dec(a){const o=[];let x=0,y=0;for(let k=0;k<a.length;k+=2){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5])}return o}const DAYS=_D.days.map(d=>{d.coords=dec(d.c);delete d.c;return d}),MERC=_D.merc,NT=_D.NT,OUTER=dec(_D.outer);const SECS=_D.secs.map(x=>{x.rings=x.r.map(dec);delete x.r;return x});const SEG=(()=>{const a=_D.seg,o=[];let x=0,y=0;for(let k=0;k<a.length;k+=4){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5,(x+a[k+2])/1e5,(y+a[k+3])/1e5])}return o})();delete window.__D;
 const DIAD='2027-06-06';
 const FN={1:'Fase 1 · Zona a favor',2:'Fase 2 · Zonas en empate',3:'Fase 3 · Zonas por recuperar'},CM={1:'#0d3b8c',2:'#b58900',3:'#e0761a'};
 const CAT={'Bastión':{c:'#0d3b8c',n:'Zona fuerte a favor'},'Defender':{c:'#4f86d6',n:'Zona a favor'},'Empate':{c:'#f2c200',n:'Zona en empate'},'Recuperable':{c:'#f08a1d',n:'Zona por recuperar'},'Adverso':{c:'#9e9e9e',n:'Zona no prioritaria'}};
@@ -325,7 +325,7 @@ function botHead(msg){return '<div class="dvtop"><div class="dvhead"><div class=
 function slot(k,role,sub,big){const p=op(k);return '<div class="oslot'+(big?' big':'')+(p&&p.n?'':' empty')+'" data-k="'+k+'" data-r="'+esc(role)+'"><div class="orole">'+esc(role)+'</div><div class="oname">'+(p&&p.n?esc(p.n):'Sin asignar · toca para agregar')+'</div>'+(sub?'<div class="osub">'+sub+'</div>':'')+'</div>'}
 function rBot(){const box=$('mbox');let h='';const v=ov.v;
  if(v==='est'){const t=orgTot(),tot=t.dir[0]+t.zon[0]+t.sec[0]+t.rg[0],need=t.dir[1]+t.zon[1]+t.sec[1]+t.rg[1];
-  h=botHead('¡Qué tal! Soy <b>Davidsito</b>, el asistente del equipo de campaña. Aquí está toda la estructura del Distrito 02.')+
+  h=botHead('Soy <b>Davidsito</b>, asistente de campaña. Esta es la estructura del Distrito 02.')+
   '<div class="card"><div class="row" style="justify-content:space-between"><b>Puestos de mando cubiertos</b><span>'+frac(tot,need)+'</span></div>'+pbar(tot,need)+
   '<div class="ogrid3"><div><div class="mut">Promotores (1×10)</div>'+frac(t.pro[0],t.pro[1])+pbar(t.pro[0],t.pro[1],'var(--ok)')+'</div><div><div class="mut">Repres. de casilla</div>'+frac(t.rc[0],t.rc[1])+pbar(t.rc[0],t.rc[1],'#b3261e')+'</div><div><div class="mut">Seccionales</div>'+frac(t.sec[0],t.sec[1])+pbar(t.sec[0],t.sec[1])+'</div></div></div>'+
   '<h3>Dirección</h3><div class="otree"><div class="oslot big cand"><div class="orole">Candidato · Diputación local DL02</div><div class="oname">David de la Peña</div><div class="osub">PRI · Fuerza y Corazón por Nuevo León</div></div><div class="oline"></div>'+slot('cg','Coordinación general','',true)+'<div class="oline"></div>'+
@@ -371,9 +371,10 @@ function rBot(){const box=$('mbox');let h='';const v=ov.v;
   h=botHead(p.length?'Llevamos <b>'+p.length+'</b> peticiones: '+n('pend')+' pendientes, '+n('gest')+' en gestión y '+n('res')+' resueltas'+(urg?'. <b class="warn">'+urg+' urgentes</b> sin resolver.':'.'):'Todavía no hay peticiones. Se levantan con el botón ＋ Petición en el mapa o durante el recorrido.')+
   '<button class="btn" id="ogopet">🙋 Ver peticiones</button>'+(has('a_ges')?'<div class="mut">Responsable de gestión: '+esc(op('a_ges').n)+'</div>':'')}
  else if(v==='bus'){h=botHead('Escribe el número de sección o el nombre de una colonia.')+'<input id="oq" inputmode="search" placeholder="Ej. 1012 o Mitras" value="'+esc(ov.q||'')+'"><div id="oqr"></div>'}
- box.innerHTML=h;box.scrollTop=0;bindBot()}
+ box.innerHTML=h+'<button class="btn sec" id="obotclose" style="margin-top:14px">Cerrar</button>';box.scrollTop=0;bindBot()}
 function ctr(k,label,need,hint){return '<h3>'+label+'</h3><div class="row octr"><button class="btn sec" data-c="'+k+'" data-d="-1">−</button><input id="c_'+k+'" type="number" min="0" inputmode="numeric" value="'+oc(k)+'"><button class="btn sec" data-c="'+k+'" data-d="1">＋</button><span class="mut">de '+need+'</span></div><div class="mut">'+hint+'</div>'}
 function bindBot(){const box=$('mbox'),q=(sel,f)=>box.querySelectorAll(sel).forEach(f);
+ $('obotclose').onclick=()=>{$('modal').style.display='none'};
  q('.chips button',b=>b.onclick=()=>{ov={v:b.dataset.v};rBot()});
  q('.oslot[data-k]',e=>e.onclick=()=>{ov={v:'per',k:e.dataset.k,r:e.dataset.r,back:ov};rBot()});
  q('.ozona',e=>e.onclick=()=>{ov={v:'zona',z:+e.dataset.z};rBot()});
