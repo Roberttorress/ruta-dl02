@@ -1,6 +1,6 @@
 'use strict';
 /* ===== data (injected) ===== */
-const BUILD='f8fbf9bf',_D=window.__D;function dec(a){const o=[];let x=0,y=0;for(let k=0;k<a.length;k+=2){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5])}return o}const DAYS=_D.days.map(d=>{d.coords=dec(d.c);delete d.c;return d}),MERC=_D.merc,NT=_D.NT,OUTER=dec(_D.outer);const SECS=_D.secs.map(x=>{x.rings=x.r.map(dec);delete x.r;return x});const SEG=(()=>{const a=_D.seg,o=[];let x=0,y=0;for(let k=0;k<a.length;k+=4){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5,(x+a[k+2])/1e5,(y+a[k+3])/1e5])}return o})();delete window.__D;
+const BUILD='b9498224',_D=window.__D;function dec(a){const o=[];let x=0,y=0;for(let k=0;k<a.length;k+=2){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5])}return o}const DAYS=_D.days.map(d=>{d.coords=dec(d.c);delete d.c;return d}),MERC=_D.merc,NT=_D.NT,OUTER=dec(_D.outer);const SECS=_D.secs.map(x=>{x.rings=x.r.map(dec);delete x.r;return x});const SEG=(()=>{const a=_D.seg,o=[];let x=0,y=0;for(let k=0;k<a.length;k+=4){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5,(x+a[k+2])/1e5,(y+a[k+3])/1e5])}return o})();delete window.__D;
 const DIAD='2027-06-06';
 const FN={1:'Fase 1 · Zona a favor',2:'Fase 2 · Zonas en empate',3:'Fase 3 · Zonas por recuperar'},CM={1:'#0d3b8c',2:'#b58900',3:'#e0761a'};
 const CAT={'Bastión':{c:'#0d3b8c',n:'Zona fuerte a favor'},'Defender':{c:'#4f86d6',n:'Zona a favor'},'Empate':{c:'#f2c200',n:'Zona en empate'},'Recuperable':{c:'#f08a1d',n:'Zona por recuperar'},'Adverso':{c:'#9e9e9e',n:'Zona no prioritaria'}};
@@ -305,6 +305,103 @@ function rCap(){const p=S.caps.filter(c=>c.k==='Petición'),n=st=>p.filter(c=>c.
  h+='<select id="cf"><option value="all">Todo ('+S.caps.length+')</option><option value="pend">Pendientes</option><option value="gest">En gestión</option><option value="res">Resueltas</option><option value="urg">Urgentes</option><option value="Contacto">Contactos</option><option value="Incidencia">Incidencias</option><option value="Nota">Notas</option></select>';
  const l=S.caps.slice().reverse().filter(c=>capFilter==='all'||c.st===capFilter||c.k===capFilter||(capFilter==='urg'&&c.urg==='urgente'&&c.st!=='res'));h+=l.length?l.map(petHtml).join(''):'<p class="mut">Sin registros. Toca ＋ en el mapa o en un recorrido.</p>';
  panel.innerHTML=h;$('add').onclick=()=>openCap();const cf=$('cf');cf.value=capFilter;cf.onchange=()=>{capFilter=cf.value;render()};bindPets(panel)}
+/* ===== Davidsito + estructura de campaña ===== */
+const ORG=_D.org||{zones:[],cas:{}};S.org=S.org||{p:{},c:{}};
+const AREAS=[['cg','Coordinación general','Operación diaria y enlace con el partido'],['a_ter','Territorio','4 zonas, seccionales y promotores'],['a_ges','Gestión ciudadana','Seguimiento a peticiones de calle'],['a_com','Comunicación','Redes, prensa, fotos y mensaje del día'],['a_dv','Defensa del voto','Representantes generales y de casilla'],['a_log','Logística','Transporte, materiales, agenda, mercaditos'],['a_dat','Datos y app','Respaldos, reportes y metas']];
+const casOf=s=>ORG.cas[s]||ORG.cas[String(s)]||0,prNeed=s=>Math.ceil((SB[s]?SB[s].meta:0)/10),rcNeed=s=>2*casOf(s);
+const ZN=ORG.zones.map((z,i)=>{const cas=z.secs.reduce((a,s)=>a+casOf(s),0);return{i,n:z.n,secs:z.secs.slice().sort((a,b)=>a-b),cas,rg:Math.ceil(cas/10),ln:z.secs.reduce((a,s)=>a+(SB[s]?SB[s].ln:0),0),meta:z.secs.reduce((a,s)=>a+(SB[s]?SB[s].meta:0),0)}});
+const zoneOf=s=>ZN.find(z=>z.secs.indexOf(+s)>=0);
+const op=k=>S.org.p[k]||null,oc=k=>+S.org.c[k]||0,has=k=>!!(op(k)&&op(k).n);
+function orgTot(){const r={dir:[0,AREAS.length],zon:[0,ZN.length],sec:[0,0],pro:[0,0],rg:[0,0],rc:[0,0]};
+ AREAS.forEach(a=>{if(has(a[0]))r.dir[0]++});ZN.forEach(z=>{if(has('z'+z.i))r.zon[0]++;r.rg[1]+=z.rg;for(let j=0;j<z.rg;j++)if(has('rg'+z.i+'_'+j))r.rg[0]++;
+  z.secs.forEach(s=>{r.sec[1]++;if(has('s'+s))r.sec[0]++;r.pro[1]+=prNeed(s);r.pro[0]+=Math.min(oc('pr'+s),prNeed(s));r.rc[1]+=rcNeed(s);r.rc[0]+=Math.min(oc('rc'+s),rcNeed(s))})});return r}
+const pbar=(a,b,c)=>'<div class="obar"><i style="width:'+(b?Math.min(100,Math.round(100*a/b)):0)+'%;background:'+(c||'var(--b)')+'"></i></div>';
+const frac=(a,b)=>'<b>'+fmt(a)+'</b><span class="mut"> / '+fmt(b)+'</span>';
+let ov={v:'est'};
+const DVSVG="<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 150\" class=\"dv\"><defs><linearGradient id=\"dvJ\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#83868c\"/><stop offset=\"1\" stop-color=\"#5a5d63\"/></linearGradient><pattern id=\"dvT\" width=\"3\" height=\"3\" patternUnits=\"userSpaceOnUse\"><rect width=\"3\" height=\"3\" fill=\"url(#dvJ)\"/><path d=\"M0 0l3 3M3 0L0 3\" stroke=\"#0002\" stroke-width=\".5\"/></pattern></defs><ellipse cx=\"60\" cy=\"147\" rx=\"30\" ry=\"3\" fill=\"#0003\" class=\"dv-sh\"/><g class=\"dv-b\"><path d=\"M24 150c0-22 11-33 36-35 25 2 36 13 36 35z\" fill=\"url(#dvT)\"/><path d=\"M50 115l10 18 10-18-3-1-7 8-7-8z\" fill=\"#fafafa\"/><path d=\"M50 115l-8 5 6 8-3 4 15 18-4-17z\" fill=\"#4b4e54\"/><path d=\"M70 115l8 5-6 8 3 4-15 18 4-17z\" fill=\"#4b4e54\"/><circle cx=\"60\" cy=\"141\" r=\"1.5\" fill=\"#333\"/><g class=\"dv-arm\"><path d=\"M84 123Q99 117 101 99\" stroke=\"url(#dvT)\" stroke-width=\"12\" stroke-linecap=\"round\" fill=\"none\"/><path d=\"M95 97l12 1\" stroke=\"#fafafa\" stroke-width=\"4\" stroke-linecap=\"round\"/><g fill=\"#e3b08e\"><ellipse cx=\"101\" cy=\"88\" rx=\"6.5\" ry=\"7\"/><rect x=\"95\" y=\"77\" width=\"3\" height=\"9\" rx=\"1.5\"/><rect x=\"98.5\" y=\"75\" width=\"3\" height=\"10\" rx=\"1.5\"/><rect x=\"102\" y=\"75.5\" width=\"3\" height=\"10\" rx=\"1.5\"/><rect x=\"105.3\" y=\"78\" width=\"2.8\" height=\"9\" rx=\"1.4\"/><rect x=\"91\" y=\"86\" width=\"7\" height=\"3\" rx=\"1.5\" transform=\"rotate(-30 94 87)\"/></g></g><path d=\"M53 100h14v14c-5 3-9 3-14 0z\" fill=\"#d49c7a\"/><g class=\"dv-h\"><ellipse cx=\"28\" cy=\"64\" rx=\"5\" ry=\"8\" fill=\"#dfa886\"/><ellipse cx=\"92\" cy=\"64\" rx=\"5\" ry=\"8\" fill=\"#dfa886\"/><path d=\"M30 56c0-20 12-31 30-31s30 11 30 31c0 24-11 46-30 46S30 80 30 56z\" fill=\"#e8b894\"/><path d=\"M30.5 62C31 86 43 105 60 105S89 86 89.5 62c-1 7-3 11-6 14-3 3-6 4-10 3-4-1-8-2-13-2s-9 1-13 2c-4 1-7 0-10-3-3-3-5-7-6-14z\" fill=\"#2b221d\"/><path d=\"M33 70c2 4 4 6 7 7M87 70c-2 4-4 6-7 7\" stroke=\"#2b221d\" stroke-width=\"2\" fill=\"none\"/><path d=\"M47 80c4-3 9-4 13-2 4-2 9-1 13 2-4 2-9 2-13 1-4 1-9 1-13-1z\" fill=\"#1f1915\"/><path d=\"M54 86c3 1.5 9 1.5 12 0-1 2.5-3 3.5-6 3.5s-5-1-6-3.5z\" fill=\"#b5675b\"/><path d=\"M29.5 57C27 34 36 15 57 12c16-2 30 6 33 22 1 7 1 15 0 22-2-9-5-15-9-18-2-7-8-10-16-10-8 0-17 1-23 3-6 2-10 7-11 13-1 4-1 8-1.5 13z\" fill=\"#1c1917\"/><path d=\"M44 23c8-5 20-6 31-2M49 18c8-3 17-3 25 0M40 30c6-4 14-5 22-5\" stroke=\"#3d3530\" stroke-width=\"1.6\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M29.5 50h4v14h-3zM86.5 50h4v14h-4z\" fill=\"#1c1917\"/><path d=\"M36 50c5-3 11-4 17-2\" stroke=\"#1c1917\" stroke-width=\"3.6\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M67 48c6-2 12-1 17 2\" stroke=\"#1c1917\" stroke-width=\"3.6\" fill=\"none\" stroke-linecap=\"round\"/><g class=\"dv-eye\"><ellipse cx=\"46\" cy=\"59\" rx=\"2.8\" ry=\"3.2\" fill=\"#2a1c14\"/><ellipse cx=\"74\" cy=\"59\" rx=\"2.8\" ry=\"3.2\" fill=\"#2a1c14\"/><circle cx=\"47\" cy=\"58\" r=\".9\" fill=\"#fff\"/><circle cx=\"75\" cy=\"58\" r=\".9\" fill=\"#fff\"/></g><g fill=\"none\" stroke=\"#111\" stroke-width=\"3\" stroke-linejoin=\"round\"><rect x=\"34\" y=\"52\" width=\"23\" height=\"14\" rx=\"3.5\"/><rect x=\"63\" y=\"52\" width=\"23\" height=\"14\" rx=\"3.5\"/><path d=\"M57 57c2-2 4-2 6 0M34 56l-5-2M86 56l5-2\"/></g><rect x=\"36\" y=\"54\" width=\"7\" height=\"2.5\" rx=\"1.2\" fill=\"#fff7\"/><rect x=\"65\" y=\"54\" width=\"7\" height=\"2.5\" rx=\"1.2\" fill=\"#fff7\"/><path d=\"M60 62c-1 4-3 7-3 9 1 1 4 1.5 6 0\" stroke=\"#c48a69\" stroke-width=\"1.8\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"38\" cy=\"70\" rx=\"4\" ry=\"2.2\" fill=\"#e79a86\" opacity=\".45\"/><ellipse cx=\"82\" cy=\"70\" rx=\"4\" ry=\"2.2\" fill=\"#e79a86\" opacity=\".45\"/></g></g></svg>";
+function openBot(v){ov=v||{v:'est'};$('modal').style.display='flex';$('mbox').classList.add('orgbox');rBot();try{if(!S.org.seen){S.org.seen=1;save()}}catch(e){}}
+function botHead(msg){return '<div class="dvhead"><div class="dvmini">'+DVSVG+'</div><div class="dvsay">'+msg+'</div><button class="dvx" id="dvx">✕</button></div>'+
+ '<div class="chips">'+[['est','🏛️ Estructura'],['hoy','📍 ¿Qué toca hoy?'],['metas','🎯 Metas'],['pet','🙋 Peticiones'],['bus','🔎 Buscar sección']].map(c=>'<button data-v="'+c[0]+'" class="'+(ov.v===c[0]||(c[0]==='est'&&/^(zona|sec|per)$/.test(ov.v))?'on':'')+'">'+c[1]+'</button>').join('')+'</div>'}
+function slot(k,role,sub,big){const p=op(k);return '<div class="oslot'+(big?' big':'')+(p&&p.n?'':' empty')+'" data-k="'+k+'" data-r="'+esc(role)+'"><div class="orole">'+esc(role)+'</div><div class="oname">'+(p&&p.n?esc(p.n):'Sin asignar · toca para agregar')+'</div>'+(sub?'<div class="osub">'+sub+'</div>':'')+'</div>'}
+function rBot(){const box=$('mbox');let h='';const v=ov.v;
+ if(v==='est'){const t=orgTot(),tot=t.dir[0]+t.zon[0]+t.sec[0]+t.rg[0],need=t.dir[1]+t.zon[1]+t.sec[1]+t.rg[1];
+  h=botHead('¡Qué tal! Soy <b>Davidsito</b>, el asistente del equipo de campaña. Aquí está toda la estructura del Distrito 02.')+
+  '<div class="card"><div class="row" style="justify-content:space-between"><b>Puestos de mando cubiertos</b><span>'+frac(tot,need)+'</span></div>'+pbar(tot,need)+
+  '<div class="ogrid3"><div><div class="mut">Promotores (1×10)</div>'+frac(t.pro[0],t.pro[1])+pbar(t.pro[0],t.pro[1],'var(--ok)')+'</div><div><div class="mut">Repres. de casilla</div>'+frac(t.rc[0],t.rc[1])+pbar(t.rc[0],t.rc[1],'#b3261e')+'</div><div><div class="mut">Seccionales</div>'+frac(t.sec[0],t.sec[1])+pbar(t.sec[0],t.sec[1])+'</div></div></div>'+
+  '<h3>Dirección</h3><div class="otree"><div class="oslot big cand"><div class="orole">Candidato · Diputación local DL02</div><div class="oname">David de la Peña</div><div class="osub">PRI · Fuerza y Corazón por Nuevo León</div></div><div class="oline"></div>'+slot('cg','Coordinación general','',true)+'<div class="oline"></div>'+
+  '<div class="ogrid">'+AREAS.slice(1).map(a=>slot(a[0],a[1],a[2])).join('')+'</div></div>'+
+  '<h3>Territorio · 4 zonas</h3><div class="mut">Cada zona → coordinadores seccionales → promotores. Meta de promotores: 1 por cada 10 votos de la meta.</div>'+
+  ZN.map(z=>{let sc=0,pr=0,pn=0;z.secs.forEach(s=>{if(has('s'+s))sc++;pn+=prNeed(s);pr+=Math.min(oc('pr'+s),prNeed(s))});const zc=op('z'+z.i);
+   return '<div class="card ozona" data-z="'+z.i+'"><div class="row" style="justify-content:space-between"><b>Zona '+(z.i+1)+' · '+esc(z.n)+'</b><span class="mut">›</span></div><div class="mut">'+z.secs.length+' secciones · '+fmt(z.ln)+' electores · meta '+fmt(z.meta)+' votos · '+z.cas+' casillas</div>'+
+   '<div style="margin:6px 0 2px">👤 '+(zc&&zc.n?esc(zc.n):'<span class="warn">Coordinador de zona sin asignar</span>')+'</div>'+
+   '<div class="ogrid2"><div><span class="mut">Seccionales</span> '+frac(sc,z.secs.length)+pbar(sc,z.secs.length)+'</div><div><span class="mut">Promotores</span> '+frac(pr,pn)+pbar(pr,pn,'var(--ok)')+'</div></div></div>'}).join('')+
+  '<h3>Defensa del voto · Día D 6 de junio</h3><div class="card"><div class="mut">'+fmt(ZN.reduce((a,z)=>a+z.cas,0))+' casillas en el distrito. Un representante general por cada 10 casillas y dos representantes (propietario y suplente) por casilla.</div>'+
+  '<div class="ogrid2" style="margin-top:6px"><div><span class="mut">Generales</span> '+frac(t.rg[0],t.rg[1])+pbar(t.rg[0],t.rg[1],'#b3261e')+'</div><div><span class="mut">De casilla</span> '+frac(t.rc[0],t.rc[1])+pbar(t.rc[0],t.rc[1],'#b3261e')+'</div></div><div class="mut" style="margin-top:6px">Los generales se asignan dentro de cada zona; los de casilla, en cada sección.</div></div>'+
+  '<button class="btn sec" id="ocsv">📤 Compartir estructura (CSV)</button>'}
+ else if(v==='zona'){const z=ZN[ov.z];
+  h=botHead('Zona '+(z.i+1)+' · <b>'+esc(z.n)+'</b>. Toca una sección para asignar seccional, promotores y representantes.')+'<button class="btn sec sm" id="oback">‹ Estructura</button>'+
+  slot('z'+z.i,'Coordinación de zona',z.secs.length+' secciones · meta '+fmt(z.meta)+' votos',true)+
+  '<h3>Representantes generales ('+z.rg+')</h3><div class="ogrid">'+Array.from({length:z.rg},(_,j)=>slot('rg'+z.i+'_'+j,'Rep. general '+(j+1),'')).join('')+'</div>'+
+  '<h3>Secciones</h3>'+z.secs.map(s=>{const x=SB[s],p=op('s'+s),pn=prNeed(s),rn=rcNeed(s);
+   return '<div class="item osec" data-s="'+s+'"><span class="sem" style="background:'+CAT[x.cat].c+';flex:none"></span><div style="flex:1;min-width:0"><div class="t">'+pad(s)+' · '+(p&&p.n?esc(p.n):'<span class="warn">sin seccional</span>')+'</div><div class="m">Promotores '+Math.min(oc('pr'+s),pn)+'/'+pn+' · Casilla '+Math.min(oc('rc'+s),rn)+'/'+rn+' · meta '+fmt(x.meta)+'</div>'+pbar(Math.min(oc('pr'+s),pn),pn,'var(--ok)')+'</div></div>'}).join('')}
+ else if(v==='sec'){const s=ov.s,x=SB[s],p=op('s'+s)||{},z=zoneOf(s);
+  h=botHead('Sección <b>'+pad(s)+'</b> · '+CAT[x.cat].n.toLowerCase()+'. '+esc((x.col||'').split(',').slice(0,2).join(','))+'.')+'<button class="btn sec sm" id="oback">‹ '+(z?'Zona '+(z.i+1):'Estructura')+'</button>'+
+  '<div class="card"><div class="ogrid2"><div><div class="mut">Electores</div><b>'+fmt(x.ln)+'</b></div><div><div class="mut">Meta 2027</div><b>'+fmt(x.meta)+'</b> votos</div><div><div class="mut">Casillas</div><b>'+casOf(s)+'</b></div><div><div class="mut">Por sumar vs 2024</div><b>+'+fmt(x.delta)+'</b></div></div></div>'+
+  '<h3>Coordinador(a) seccional</h3><input id="on" placeholder="Nombre" value="'+esc(p.n||'')+'"><input id="ot" type="tel" inputmode="tel" placeholder="Teléfono (10 dígitos)" value="'+esc(p.t||'')+'">'+(p.t?'<a class="btn sec sm" target="_blank" rel="noopener" href="https://wa.me/52'+String(p.t).replace(/\D/g,'').slice(-10)+'">💬 WhatsApp</a>':'')+
+  ctr('pr'+s,'Promotores registrados',prNeed(s),'1 promotor por cada 10 votos de la meta')+ctr('rc'+s,'Representantes de casilla',rcNeed(s),casOf(s)+' casillas × 2 (propietario y suplente)')+
+  '<div class="row" style="margin-top:10px"><button class="btn" id="osave">Guardar</button><button class="btn sec" id="omap">🗺️ Ver en mapa</button></div>'}
+ else if(v==='per'){const p=op(ov.k)||{};
+  h=botHead('<b>'+esc(ov.r)+'</b>. Anota quién es responsable y su teléfono.')+'<button class="btn sec sm" id="oback">‹ Volver</button>'+
+  '<input id="on" placeholder="Nombre" value="'+esc(p.n||'')+'"><input id="ot" type="tel" inputmode="tel" placeholder="Teléfono (10 dígitos)" value="'+esc(p.t||'')+'"><textarea id="onote" rows="2" placeholder="Notas (opcional)">'+esc(p.x||'')+'</textarea>'+
+  (p.t?'<a class="btn sec" target="_blank" rel="noopener" href="https://wa.me/52'+String(p.t).replace(/\D/g,'').slice(-10)+'">💬 WhatsApp</a>':'')+
+  '<div class="row"><button class="btn" id="osave">Guardar</button>'+(p.n?'<button class="btn sec" id="odel">Quitar</button>':'')+'</div>'}
+ else if(v==='hoy'){const t=todayIso(),dt=DAYS.filter(d=>d.fecha===t),mt=MERC.find(m=>m.fecha===t),first=DAYS[0].fecha;let m;
+  if(dt.length)m='Hoy tocan <b>'+dt.length+' recorridos</b>: '+dt.map(d=>d.turno.toLowerCase()+' en '+d.secs.map(pad).join(', ')).join(' y ')+'.';
+  else if(mt)m='Hoy es <b>domingo de mercadito</b>: '+mt.cols.slice(0,2).join(' y ')+'.';
+  else if(t<first){const n=daysTo(first);m='Faltan <b>'+n+' días</b> para arrancar recorridos (lunes 5 de abril 2027). El Día D es en '+daysTo('2027-06-06')+' días.'}
+  else if(t<'2027-06-06'&&t>DAYS[DAYS.length-1].fecha)m='Veda electoral. No hay actos de campaña; revisa la defensa del voto.';
+  else if(t==='2027-06-06')m='¡Hoy es el <b>Día D</b>! Que no falte ningún representante en las casillas.';else m='Hoy no hay recorrido programado.';
+  const late=DAYS.filter(d=>d.fecha<t&&!dd(d).done).length;if(late)m+=' Hay <b>'+late+'</b> atrasados.';
+  h=botHead(m)+'<button class="btn" id="ogohoy">📍 Abrir lo de hoy</button>'}
+ else if(v==='metas'){const L=Object.values(SB),M=L.reduce((a,x)=>a+x.meta,0),Dl=L.reduce((a,x)=>a+x.delta,0),ln=L.reduce((a,x)=>a+x.ln,0),top=L.slice().sort((a,b)=>b.delta-a.delta).slice(0,8);
+  h=botHead('La meta es <b>'+fmt(M)+' votos</b> en las '+L.length+' secciones: <b>+'+fmt(Dl)+'</b> más que en 2024. Estas son las secciones donde más votos hay que sumar:')+
+  '<div class="card"><div class="ogrid3"><div><div class="mut">Electores</div><b>'+fmt(ln)+'</b></div><div><div class="mut">Meta</div><b>'+fmt(M)+'</b></div><div><div class="mut">Por sumar</div><b>+'+fmt(Dl)+'</b></div></div></div>'+
+  top.map(x=>'<div class="item osec" data-s="'+x.s+'"><span class="sem" style="background:'+CAT[x.cat].c+';flex:none"></span><div><div class="t">'+pad(x.s)+' · +'+fmt(x.delta)+' votos</div><div class="m">meta '+fmt(x.meta)+' · '+esc((x.col||'').split(',')[0])+'</div></div></div>').join('')}
+ else if(v==='pet'){const p=S.caps.filter(c=>c.k==='Petición'),n=st=>p.filter(c=>c.st===st).length,urg=p.filter(c=>c.urg==='urgente'&&c.st!=='res').length;
+  h=botHead(p.length?'Llevamos <b>'+p.length+'</b> peticiones: '+n('pend')+' pendientes, '+n('gest')+' en gestión y '+n('res')+' resueltas'+(urg?'. <b class="warn">'+urg+' urgentes</b> sin resolver.':'.'):'Todavía no hay peticiones. Se levantan con el botón ＋ Petición en el mapa o durante el recorrido.')+
+  '<button class="btn" id="ogopet">🙋 Ver peticiones</button>'+(has('a_ges')?'<div class="mut">Responsable de gestión: '+esc(op('a_ges').n)+'</div>':'')}
+ else if(v==='bus'){h=botHead('Escribe el número de sección o el nombre de una colonia.')+'<input id="oq" inputmode="search" placeholder="Ej. 1012 o Mitras" value="'+esc(ov.q||'')+'"><div id="oqr"></div>'}
+ box.innerHTML=h;box.scrollTop=0;bindBot()}
+function ctr(k,label,need,hint){return '<h3>'+label+'</h3><div class="row octr"><button class="btn sec" data-c="'+k+'" data-d="-1">−</button><input id="c_'+k+'" type="number" min="0" inputmode="numeric" value="'+oc(k)+'"><button class="btn sec" data-c="'+k+'" data-d="1">＋</button><span class="mut">de '+need+'</span></div><div class="mut">'+hint+'</div>'}
+function bindBot(){const box=$('mbox'),q=(sel,f)=>box.querySelectorAll(sel).forEach(f);
+ $('dvx').onclick=()=>{$('modal').style.display='none'};
+ q('.chips button',b=>b.onclick=()=>{ov={v:b.dataset.v};rBot()});
+ q('.oslot[data-k]',e=>e.onclick=()=>{ov={v:'per',k:e.dataset.k,r:e.dataset.r,back:ov};rBot()});
+ q('.ozona',e=>e.onclick=()=>{ov={v:'zona',z:+e.dataset.z};rBot()});
+ q('.osec',e=>e.onclick=()=>{ov={v:'sec',s:+e.dataset.s,back:ov};rBot()});
+ q('[data-c]',b=>b.onclick=()=>{const i=$('c_'+b.dataset.c);i.value=Math.max(0,(+i.value||0)+(+b.dataset.d))});
+ const bk=$('oback');if(bk)bk.onclick=()=>{ov=ov.back||(ov.v==='sec'&&zoneOf(ov.s)?{v:'zona',z:zoneOf(ov.s).i}:{v:'est'});rBot()};
+ const sv=$('osave');if(sv)sv.onclick=()=>{const n=$('on').value.trim(),t=$('ot').value.trim(),k=ov.v==='sec'?'s'+ov.s:ov.k;
+  if(n||t)S.org.p[k]={n,t,x:$('onote')?$('onote').value.trim():''};else delete S.org.p[k];
+  if(ov.v==='sec')['pr','rc'].forEach(c=>{const i=$('c_'+c+ov.s);if(i)S.org.c[c+ov.s]=Math.max(0,+i.value||0)});
+  save(true);toast('✅ Guardado');ov=ov.back||(ov.v==='sec'&&zoneOf(ov.s)?{v:'zona',z:zoneOf(ov.s).i}:{v:'est'});rBot()};
+ const dl=$('odel');if(dl)dl.onclick=()=>{delete S.org.p[ov.k];save(true);ov=ov.back||{v:'est'};rBot()};
+ const mp=$('omap');if(mp)mp.onclick=()=>{const x=SB[ov.s];$('modal').style.display='none';sel=x;fitBounds(x.rings[0],.3);showPop(x);reqDraw()};
+ const gh=$('ogohoy');if(gh)gh.onclick=()=>{$('modal').style.display='none';goHome()};
+ const gp=$('ogopet');if(gp)gp.onclick=()=>{$('modal').style.display='none';tab='cap';render()};
+ const cs=$('ocsv');if(cs)cs.onclick=orgCsv;
+ const oq=$('oq');if(oq){const go=()=>{const v=oq.value.trim().toUpperCase();ov.q=oq.value;const r=v.length<2?[]:Object.values(SB).filter(x=>pad(x.s).indexOf(v)>=0||(x.col||'').toUpperCase().indexOf(v)>=0).slice(0,20);
+  $('oqr').innerHTML=r.map(x=>{const p=op('s'+x.s);return '<div class="item osec" data-s="'+x.s+'"><span class="sem" style="background:'+CAT[x.cat].c+';flex:none"></span><div><div class="t">'+pad(x.s)+' · '+(p&&p.n?esc(p.n):'sin seccional')+'</div><div class="m">'+esc((x.col||'').split(',').slice(0,3).join(','))+'</div></div></div>'}).join('')||(v.length>=2?'<p class="mut">Sin resultados.</p>':'');
+  $('oqr').querySelectorAll('.osec').forEach(e=>e.onclick=()=>{ov={v:'sec',s:+e.dataset.s,back:{v:'bus',q:oq.value}};rBot()})};oq.oninput=go;go();setTimeout(()=>oq.focus(),50)}}
+function orgCsv(){const rows=[['Nivel','Zona','Seccion','Puesto','Nombre','Telefono','Registrados','Requeridos']],P=(k)=>op(k)||{};
+ rows.push(['Direccion','','','Candidato','David de la Peña','','','']);AREAS.forEach(a=>rows.push(['Direccion','','',a[1],P(a[0]).n||'',P(a[0]).t||'','','']));
+ ZN.forEach(z=>{rows.push(['Zona',z.n,'','Coordinacion de zona',P('z'+z.i).n||'',P('z'+z.i).t||'','','']);for(let j=0;j<z.rg;j++)rows.push(['Defensa del voto',z.n,'','Representante general '+(j+1),P('rg'+z.i+'_'+j).n||'',P('rg'+z.i+'_'+j).t||'','','']);
+  z.secs.forEach(s=>{rows.push(['Seccion',z.n,pad(s),'Coordinacion seccional',P('s'+s).n||'',P('s'+s).t||'','','']);rows.push(['Seccion',z.n,pad(s),'Promotores','','',oc('pr'+s),prNeed(s)]);rows.push(['Seccion',z.n,pad(s),'Representantes de casilla','','',oc('rc'+s),rcNeed(s)])})});
+ shareFile('estructura_DL02.csv','﻿'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n'),'text/csv')}
+(function(){const b=$('dvbot');if(!b)return;b.innerHTML=DVSVG+'<span id="dvbub">¡Hola! Toca para ver la estructura</span>';b.onclick=()=>openBot();
+ const obs=new MutationObserver(()=>{if($('modal').style.display!=='flex')$('mbox').classList.remove('orgbox')});obs.observe($('modal'),{attributes:true,attributeFilter:['style']});
+ if(!S.org.seen)setTimeout(()=>{const u=$('dvbub');if(u){u.style.display='block';setTimeout(()=>u.style.display='none',6000)}},1500)})();
+
 /* ===== boot ===== */
 window.addEventListener('online',()=>{useTiles=true;tileFail=0;reqDraw()});window.addEventListener('offline',()=>{useTiles=false;reqDraw()});
 document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')$('modal').style.display='none'});
