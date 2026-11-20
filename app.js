@@ -1,6 +1,6 @@
 'use strict';
 /* ===== data (injected) ===== */
-const BUILD='a984793a',_D=window.__D;function dec(a){const o=[];let x=0,y=0;for(let k=0;k<a.length;k+=2){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5])}return o}const DAYS=_D.days.map(d=>{d.coords=dec(d.c);delete d.c;return d}),MERC=_D.merc,NT=_D.NT,OUTER=dec(_D.outer);const SECS=_D.secs.map(x=>{x.rings=x.r.map(dec);delete x.r;return x});const SEG=(()=>{const a=_D.seg,o=[];let x=0,y=0;for(let k=0;k<a.length;k+=4){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5,(x+a[k+2])/1e5,(y+a[k+3])/1e5])}return o})();delete window.__D;
+const BUILD='2d9da0f8',_D=window.__D;function dec(a){const o=[];let x=0,y=0;for(let k=0;k<a.length;k+=2){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5])}return o}const DAYS=_D.days.map(d=>{d.coords=dec(d.c);delete d.c;return d}),MERC=_D.merc,NT=_D.NT,OUTER=dec(_D.outer);const SECS=_D.secs.map(x=>{x.rings=x.r.map(dec);delete x.r;return x});const SEG=(()=>{const a=_D.seg,o=[];let x=0,y=0;for(let k=0;k<a.length;k+=4){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5,(x+a[k+2])/1e5,(y+a[k+3])/1e5])}return o})();delete window.__D;
 const DIAD='2027-06-06';
 const FN={1:'Fase 1 · Zona a favor',2:'Fase 2 · Zonas en empate',3:'Fase 3 · Zonas por recuperar'},CM={1:'#0d3b8c',2:'#b58900',3:'#e0761a'};
 const CAT={'Bastión':{c:'#0d3b8c',n:'Zona fuerte a favor'},'Defender':{c:'#4f86d6',n:'Zona a favor'},'Empate':{c:'#f2c200',n:'Zona en empate'},'Recuperable':{c:'#f08a1d',n:'Zona por recuperar'},'Adverso':{c:'#9e9e9e',n:'Zona no prioritaria'}};
@@ -54,28 +54,30 @@ const sc=()=>2**(view.z-Z0),cw=()=>[wx(view.lon),wy(view.lat)];
 function proj(lon,lat){const s=sc(),c=cw();return [(wx(lon)-c[0])*s+W/2,(wy(lat)-c[1])*s+H/2]}
 function unproj(px,py){const s=sc(),c=cw();const X=(px-W/2)/s+c[0]+X0,Y=(py-H/2)/s+c[1]+Y0;return [ilx(X,Z0),ily(Y,Z0)]}
 const mPerPx=()=>40075016*Math.cos(view.lat*Math.PI/180)/(TS*2**view.z);
+let _mbg=null,_mbgT=0;const mapBg=()=>{const n=performance.now();if(!_mbg||n-_mbgT>2000){_mbg=getComputedStyle(document.body).getPropertyValue('--mapbg').trim()||'#f3efe6';_mbgT=n}return _mbg};
 function reqDraw(){if(drawQ)return;drawQ=true;requestAnimationFrame(()=>{drawQ=false;draw()})}
 let cur=null,me=null,sel=null,hl=null,follow=false;const dark=()=>matchMedia('(prefers-color-scheme:dark)').matches&&!S.prefs.hc;
-function draw(){if(!W)return;const s=sc(),c=cw();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle=getComputedStyle(document.body).getPropertyValue('--mapbg')||'#f3efe6';ctx.fillRect(0,0,W,H);
+function draw(){if(!W)return;const s=sc(),c=cw();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle=mapBg();ctx.fillRect(0,0,W,H);
  if(useTiles){const zi=Math.max(11,Math.min(19,Math.round(view.z))),k=2**(view.z-zi),cx=lx(view.lon,zi),cy=ly(view.lat,zi);const x0=Math.floor((cx-W/2/k)/TS),x1=Math.floor((cx+W/2/k)/TS),y0=Math.floor((cy-H/2/k)/TS),y1=Math.floor((cy+H/2/k)/TS);
   for(let x=x0;x<=x1;x++)for(let y=y0;y<=y1;y++){const t=tile(zi,x,y);if(t.ok)ctx.drawImage(t.im,(x*TS-cx)*k+W/2,(y*TS-cy)*k+H/2,TS*k+.6,TS*k+.6)}
-  ctx.fillStyle=dark()?'#0005':'#fff4';ctx.fillRect(0,0,W,H)}
+  ctx.fillStyle=dark()?'#0004':'#ffffff1f';ctx.fillRect(0,0,W,H)}
  ctx.setTransform(DPR*s,0,0,DPR*s,DPR*(W/2-c[0]*s),DPR*(H/2-c[1]*s));
  if(!useTiles){ctx.strokeStyle=dark()?'#4a4a4a':'#b9b4a8';ctx.lineWidth=(view.z>=16?1.6:1)/s;ctx.stroke(P_STREETS)}
+ {ctx.save();const big=new Path2D();big.rect(c[0]-W/s,c[1]-H/s,2*W/s,2*H/s);big.addPath(P_OUTER);ctx.fillStyle=dark()?'#000':'#fff';ctx.globalAlpha=dark()?.45:.5;ctx.fill(big,'evenodd');ctx.restore()}
  const cs=cur?new Set(cur.secs):null;
- for(const k in P_CAT){ctx.fillStyle=CAT[k].c;ctx.globalAlpha=cur?.07:.13;ctx.fill(P_CAT[k])}ctx.globalAlpha=1;
- if(cs)SECS.forEach(x=>{if(cs.has(x.s)){ctx.fillStyle=CAT[x.cat].c;ctx.globalAlpha=.26;ctx.fill(x.path);ctx.globalAlpha=1}});
- if(sel){ctx.fillStyle=CAT[sel.cat].c;ctx.globalAlpha=.4;ctx.fill(sel.path);ctx.globalAlpha=1}
+ for(const k in P_CAT){ctx.fillStyle=CAT[k].c;ctx.globalAlpha=cur?.12:(dark()?.34:.30);ctx.fill(P_CAT[k])}ctx.globalAlpha=1;
+ if(cs)SECS.forEach(x=>{if(cs.has(x.s)){ctx.fillStyle=CAT[x.cat].c;ctx.globalAlpha=.42;ctx.fill(x.path);ctx.globalAlpha=1}});
+ if(sel){ctx.fillStyle=CAT[sel.cat].c;ctx.globalAlpha=.55;ctx.fill(sel.path);ctx.globalAlpha=1}
  if(hl)hl.forEach(x=>{ctx.strokeStyle='#e0119d';ctx.lineWidth=4/s;ctx.stroke(x.path)});
- ctx.strokeStyle=dark()?'#777':'#666';ctx.lineWidth=.8/s;ctx.stroke(P_BORD);
+ ctx.strokeStyle=dark()?'#ffffff40':'#ffffffd0';ctx.lineWidth=1.1/s;ctx.stroke(P_BORD);
  if(cs){ctx.strokeStyle=CM[cur.f];ctx.lineWidth=2.5/s;SECS.forEach(x=>{if(cs.has(x.s))ctx.stroke(x.path)})}
  ctx.strokeStyle='#000';ctx.lineWidth=3/s;ctx.stroke(P_OUTER);
  if(cur&&!cur.test){const p=routePath(cur);ctx.lineJoin='round';ctx.lineCap='round';ctx.strokeStyle='#fff';ctx.lineWidth=10/s;ctx.stroke(p);ctx.strokeStyle=CM[cur.f];ctx.lineWidth=6/s;ctx.stroke(p);
   const pr=dd(cur).prog||0;if(pr>0){ctx.beginPath();for(let i=0;i<=Math.min(pr,cur.coords.length-1);i++){const q=cur.coords[i];i?ctx.lineTo(wx(q[0]),wy(q[1])):ctx.moveTo(wx(q[0]),wy(q[1]))}ctx.strokeStyle='#1a9d2b';ctx.lineWidth=6/s;ctx.stroke()}
   if(view.z>=15.5)arrows(cur,s)}
  ctx.setTransform(DPR,0,0,DPR,0,0);
- if(view.z>=13.5){const fs=Math.round(Math.min(14,8+(view.z-13.5)*2.5));ctx.font='bold '+fs+'px system-ui';ctx.textAlign='center';ctx.lineWidth=3;ctx.strokeStyle='#fff';ctx.fillStyle='#111';
-  SECS.forEach(x=>{const q=proj(x.c[0],x.c[1]);if(q[0]<-20||q[0]>W+20||q[1]<-20||q[1]>H+20)return;ctx.strokeText(pad(x.s),q[0],q[1]);ctx.fillText(pad(x.s),q[0],q[1])})}
+ if(view.z>=13.3){const fs=Math.round(Math.min(13,9+(view.z-13.3)*1.8));ctx.font='600 '+fs+'px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineWidth=3;ctx.strokeStyle=dark()?'#000c':'#fffd';ctx.fillStyle=dark()?'#eee':'#222';const taken=[],bw=fs*2.6,bh=fs*1.25;
+  const pri=x=>(sel&&sel.s===x.s)||(cur&&cur.secs.includes(x.s))?0:1;SECS.slice().sort((a,b)=>pri(a)-pri(b)).forEach(x=>{const q=proj(x.c[0],x.c[1]);if(q[0]<-20||q[0]>W+20||q[1]<-20||q[1]>H+20)return;if(taken.some(t=>Math.abs(t[0]-q[0])<bw&&Math.abs(t[1]-q[1])<bh))return;taken.push(q);ctx.strokeText(pad(x.s),q[0],q[1]);ctx.fillText(pad(x.s),q[0],q[1])});ctx.textBaseline='alphabetic'}
  if(cur&&!cur.test){dot(proj(...cur.coords[0]),'#1a9d2b','Inicio');dot(proj(...cur.coords.at(-1)),'#000','Fin');if(street.on&&street.next){const q=proj(...cur.coords[street.next.i]);ctx.beginPath();ctx.arc(q[0],q[1],8,0,7);ctx.strokeStyle='#e0119d';ctx.lineWidth=3;ctx.stroke()}}
  if(view.z>=16.5)S.tally.forEach(t=>{if(!t.lon)return;const q=proj(t.lon,t.lat);if(q[0]<0||q[0]>W||q[1]<0||q[1]>H)return;ctx.beginPath();ctx.arc(q[0],q[1],4,0,7);ctx.fillStyle=TALLY[t.r].c;ctx.fill()});
  if(view.z>=14)S.caps.forEach(k=>{if(!k.lon)return;const q=proj(k.lon,k.lat);if(q[0]<-20||q[0]>W+20||q[1]<-20||q[1]>H+20)return;ctx.beginPath();ctx.arc(q[0],q[1],13,0,7);ctx.fillStyle=k.st?(k.st==='res'?'#1a9d2b':k.urg==='urgente'?'#b3261e':k.st==='gest'?'#1a73e8':'#b58900'):'#555';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();ctx.font='14px system-ui';ctx.textAlign='center';ctx.fillText(k.cat?PCAT[k.cat]:KIND[k.k],q[0],q[1]+5)});
@@ -84,12 +86,20 @@ function draw(){if(!W)return;const s=sc(),c=cw();ctx.setTransform(DPR,0,0,DPR,0,
 function arrows(d,s){const step=120;let next=step;ctx.fillStyle='#fff';for(let i=0;i<d.coords.length-1;i++){if(d.cum[i+1]<next)continue;const a=d.coords[i],b=d.coords[i+1];const ang=Math.atan2(wy(b[1])-wy(a[1]),wx(b[0])-wx(a[0]));const t=(next-d.cum[i])/((d.cum[i+1]-d.cum[i])||1);const x=wx(a[0])+(wx(b[0])-wx(a[0]))*t,y=wy(a[1])+(wy(b[1])-wy(a[1]))*t;ctx.save();ctx.translate(x,y);ctx.rotate(ang);ctx.beginPath();ctx.moveTo(4/s,0);ctx.lineTo(-3/s,3/s);ctx.lineTo(-3/s,-3/s);ctx.closePath();ctx.fill();ctx.restore();next+=step}}
 function dot(p,c,label){ctx.beginPath();ctx.arc(p[0],p[1],10,0,7);ctx.fillStyle=c;ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke();if(label){ctx.font='bold 13px system-ui';ctx.textAlign='center';ctx.lineWidth=4;ctx.strokeStyle='#fff';ctx.fillStyle='#111';ctx.strokeText(label,p[0],p[1]-15);ctx.fillText(label,p[0],p[1]-15)}}
 /* gestures */
-let ptrs=new Map(),last=null,pinch=null,moved=false;
-cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,[e.clientX,e.clientY]);moved=false;if(ptrs.size===1)last=[e.clientX,e.clientY];if(ptrs.size===2){const a=[...ptrs.values()];pinch={d:Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1]),z:view.z,c:[(a[0][0]+a[1][0])/2,(a[0][1]+a[1][1])/2]}}});
+let ptrs=new Map(),last=null,pinch=null,moved=false,d0=null,vel=[0,0],lt=0,inert=0,hadPinch=false,lastTap=0,lastTapP=null;
+const pinchStart=()=>{const a=[...ptrs.values()];pinch={d:Math.max(10,Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1])),z:view.z,c:[(a[0][0]+a[1][0])/2,(a[0][1]+a[1][1])/2]}};
+cv.addEventListener('pointerdown',e=>{cancelAnimationFrame(inert);try{cv.setPointerCapture(e.pointerId)}catch(_){}ptrs.set(e.pointerId,[e.clientX,e.clientY]);
+ if(ptrs.size===1){moved=false;hadPinch=false;last=[e.clientX,e.clientY];d0=[e.clientX,e.clientY];vel=[0,0];lt=performance.now()}else if(ptrs.size===2){pinchStart();moved=true;hadPinch=true}});
 cv.addEventListener('pointermove',e=>{if(!ptrs.has(e.pointerId))return;ptrs.set(e.pointerId,[e.clientX,e.clientY]);const r=cv.getBoundingClientRect();
- if(ptrs.size===2&&pinch){const a=[...ptrs.values()];const d=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1]);zoomAt(Math.max(11,Math.min(19.5,pinch.z+Math.log2(d/pinch.d))),[pinch.c[0]-r.left,pinch.c[1]-r.top]);const c=[(a[0][0]+a[1][0])/2,(a[0][1]+a[1][1])/2];panPx(c[0]-pinch.c[0],c[1]-pinch.c[1]);pinch.c=c;moved=true;setFollow(false)}
- else if(ptrs.size===1&&last){const dx=e.clientX-last[0],dy=e.clientY-last[1];if(Math.hypot(dx,dy)>3){moved=true;setFollow(false)}if(moved){panPx(dx,dy);last=[e.clientX,e.clientY]}}});
-function up(e){ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;if(ptrs.size===0){if(!moved)tap(e.clientX,e.clientY);last=null}}
+ if(ptrs.size>=2&&pinch){const a=[...ptrs.values()];const d=Math.max(10,Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1]));zoomAt(Math.max(11,Math.min(19.5,pinch.z+Math.log2(d/pinch.d))),[pinch.c[0]-r.left,pinch.c[1]-r.top]);const c=[(a[0][0]+a[1][0])/2,(a[0][1]+a[1][1])/2];panPx(c[0]-pinch.c[0],c[1]-pinch.c[1]);pinch.c=c;setFollow(false)}
+ else if(ptrs.size===1&&last){if(!moved&&Math.hypot(e.clientX-d0[0],e.clientY-d0[1])>6){moved=true;setFollow(false)}
+  if(moved){const now=performance.now(),dx=e.clientX-last[0],dy=e.clientY-last[1],dt=Math.max(1,now-lt);vel=[.75*dx/dt+.25*vel[0],.75*dy/dt+.25*vel[1]];lt=now;panPx(dx,dy);last=[e.clientX,e.clientY]}}});
+function up(e){if(!ptrs.has(e.pointerId))return;ptrs.delete(e.pointerId);const now=performance.now();
+ if(ptrs.size===1){pinch=null;last=[...ptrs.values()][0].slice();lt=now;vel=[0,0];return}
+ if(ptrs.size>=2){pinchStart();return}
+ pinch=null;last=null;
+ if(!moved){const t=Date.now(),p=[e.clientX,e.clientY];if(t-lastTap<320&&lastTapP&&Math.hypot(p[0]-lastTapP[0],p[1]-lastTapP[1])<30){const r=cv.getBoundingClientRect();zoomAt(Math.min(19.5,view.z+1),[p[0]-r.left,p[1]-r.top]);lastTap=0;return}lastTap=t;lastTapP=p;tap(e.clientX,e.clientY);return}
+ if(!hadPinch&&now-lt<90){let vx=vel[0]*16,vy=vel[1]*16;if(Math.hypot(vx,vy)>4){const step=()=>{panPx(vx,vy);vx*=.9;vy*=.9;if(Math.hypot(vx,vy)>.4)inert=requestAnimationFrame(step)};inert=requestAnimationFrame(step)}}}
 cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
 cv.addEventListener('wheel',e=>{e.preventDefault();zoomAt(Math.max(11,Math.min(19.5,view.z-e.deltaY*.002)),[e.offsetX,e.offsetY])},{passive:false});
 function panPx(dx,dy){const c=unproj(W/2-dx,H/2-dy);view.lon=c[0];view.lat=c[1];reqDraw()}
@@ -119,10 +129,10 @@ function dayCard(d){const o=dd(d),pr=o.prog?Math.round(100*d.cum[Math.min(o.prog
 function mercCard(m){return '<div class="card" style="border:2px solid var(--org)"><div style="font-size:20px;font-weight:800">🛒 Domingo de mercadito</div><div class="mut">'+fdate(m.fecha,{weekday:'long',day:'numeric',month:'long'})+'</div><p>Sin recorrido casa por casa. Presencia en el mercado rodante de la zona de esta semana:</p>'+m.secs.filter(x=>SB[x]).map((x,i)=>'<div><span class="sem" style="background:'+CAT[SB[x].cat].c+'"></span><b>'+pad(x)+'</b> '+esc(m.cols[i])+'</div>').join('')+'<p class="mut">Anuncia los recorridos de la semana y levanta peticiones con el botón ＋.</p><button class="btn sec" onclick="openCap()">＋ Registrar petición</button></div>'}
 function listHtml(list){return list.map(d=>{const o=dd(d);return '<div class="item'+(o.done?' done':'')+(cur===d?' sel':'')+'" data-d="'+d.dia+'"><div class="chk">✓</div><div style="flex:1"><div class="t"><span class="sem" style="background:'+CM[d.f]+'"></span>'+fdate(d.fecha)+' · '+d.turno+'</div><div class="m">'+d.secs.map(pad).join(', ')+' · '+(d.len/1000).toFixed(1)+' km'+(o.sum?' · 👍 '+o.sum.fav:'')+'</div></div></div>'}).join('')}
 function bindList(){panel.querySelectorAll('.item[data-d],.go').forEach(e=>e.onclick=()=>openDay(DAYS.find(x=>x.dia==e.dataset.d)))}
-function rHoy(){const t=todayIso();let h=diaD();const done=DAYS.filter(d=>dd(d).done).length;const first=DAYS[0].fecha,lastD=DAYS.at(-1).fecha;
+function rHoy(){const t=todayIso();let h='';const done=DAYS.filter(d=>dd(d).done).length;const first=DAYS[0].fecha,lastD=DAYS.at(-1).fecha;
  if(cur){panel.innerHTML=briefing(cur);bindBrief();return}
- h+='<div class="mut">'+done+' de '+DAYS.length+' recorridos hechos</div>';const mt=MERC.find(m=>m.fecha===t),td=DAYS.filter(d=>d.fecha===t);
- if(t<first){h+='<div class="card" style="border:2px dashed var(--b)"><b>🧪 ¿Quieren probar la app?</b><div class="mut">Haz un recorrido de prueba donde estés: GPS, botones de puerta, peticiones y reporte. No cuenta en el avance real.</div><button class="btn" onclick="startPractice()">🧪 Recorrido de prueba aquí</button></div>';h+='<h1>Arranque: '+fdate(first,{weekday:'long',day:'numeric',month:'long'})+'</h1><p class="mut">5 abr – 2 jun · 2 recorridos diarios de lunes a sábado · domingos de mercadito.</p>';DAYS.filter(d=>d.cal===1).forEach(d=>h+=dayCard(d))}
+ const nD=daysTo(DIAD);h+='<div class="hstat">'+(nD>=0?'<button class="pill pd" id="hdd">🗳 Día D'+(nD?' · '+nD+' días':' · ¡hoy!')+' ›</button>':'')+'<span class="pill">✅ '+done+'/'+DAYS.length+' recorridos</span></div>';const mt=MERC.find(m=>m.fecha===t),td=DAYS.filter(d=>d.fecha===t);
+ if(t<first){h+='<h1>Arranque: '+fdate(first,{weekday:'long',day:'numeric',month:'long'})+'</h1><p class="mut">Primer día de recorridos</p>';DAYS.filter(d=>d.cal===1).forEach(d=>h+=dayCard(d));h+='<button class="btn sec" onclick="startPractice()">🧪 Probar un recorrido aquí <span class="mut">(no cuenta)</span></button>'}
  else if(mt){h+='<h1>Hoy</h1>'+mercCard(mt);const nx=DAYS.find(d=>d.fecha>t);if(nx){h+='<h2>Siguiente: '+fdate(nx.fecha,{weekday:'long',day:'numeric',month:'long'})+'</h2>';DAYS.filter(d=>d.cal===nx.cal).forEach(d=>h+=dayCard(d))}}
  else if(td.length){h+='<h1>Hoy · Día '+td[0].cal+' de '+NCAL+'</h1><div class="mut">'+fdate(t,{weekday:'long',day:'numeric',month:'long'})+'</div>';td.forEach(d=>h+=dayCard(d))}
  else if(t>lastD)h+='<h1>'+(t===DIAD?'Día D':'Cierre de campaña')+'</h1><p class="mut">'+(t===DIAD?'Jornada electoral: defensa del voto y representantes en las 343 casillas.':'Recorridos terminados el 2 de junio. Veda del 3 al 5 de junio; la elección es el domingo 6.')+'</p>';
@@ -405,23 +415,28 @@ function orgCsv(){const rows=[['Nivel','Zona','Seccion','Puesto','Nombre','Telef
 (function(){const close=()=>{$('modal').style.display='none'};$('mclose').onclick=close;$('pclose').onclick=e=>{e.stopPropagation();$('photo').style.display='none'};
  document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if($('photo').style.display&&$('photo').style.display!=='none'){$('photo').style.display='none'}else if($('modal').style.display==='flex'){close()}else if($('pop').style.display==='block'){$('pop').style.display='none'}})})();
 
-/* hoja de abajo arrastrable (iPhone) */
+/* hoja de abajo arrastrable (iPhone); el mapa no se estira mientras se mueve */
 (function(){const mq=matchMedia('(max-width:999px) and (min-height:501px)'),side=$('side'),app=$('app');if(!side)return;
  const g=document.createElement('div');g.id='grab';g.setAttribute('aria-label','Arrastra para ver más o menos mapa');side.insertBefore(g,side.firstChild);
- const pts=()=>{const H=app.clientHeight,t=$('tabs').offsetHeight;return {min:t+26,mid:Math.round(H*.55),max:H-110}};
- let st=(S.prefs&&S.prefs.sheet)||'mid',raf=0;
- const apply=(h,anim)=>{side.style.transition=anim?'height .25s ease':'none';side.style.height=h+'px';cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>resize());if(anim)setTimeout(()=>resize(),280)};
- const snap=s=>{st=s;S.prefs.sheet=s;save();side.classList.toggle('sheetmin',s==='min');document.body.classList.toggle('sheetmax',s==='max'&&mq.matches);if(mq.matches){apply(pts()[s],true);setTimeout(()=>{if(!cur&&!sel&&!follow&&s!=='max')fitBounds(OUTER,.05)},300)}};
- const set=()=>{document.body.classList.toggle('sheetmax',st==='max'&&mq.matches);if(mq.matches){apply(pts()[st],false);side.classList.toggle('sheetmin',st==='min')}else{side.style.height='';side.classList.remove('sheetmin')}};
+ const pts=()=>{const H_=app.clientHeight,t=$('tabs').offsetHeight;return {min:t+26,mid:Math.round(H_*.55),max:H_-110}};
+ let st=(S.prefs&&S.prefs.sheet)||'mid',tmr=0,frozen=false;
+ const recenter=nh=>{const c=unproj(W/2,nh/2);view.lon=c[0];view.lat=c[1]};
+ const freeze=()=>{const hf=app.clientHeight;if(frozen&&cv.clientHeight===hf)return;cv.style.bottom='auto';cv.style.height=hf+'px';recenter(hf);frozen=true;resize()};
+ const settle=()=>{cv.style.height='';cv.style.bottom='';const nh=cv.clientHeight;if(nh&&nh!==H){recenter(nh)}frozen=false;resize()};
+ const apply=(h,anim)=>{clearTimeout(tmr);if(anim){freeze();side.style.transition='height .26s cubic-bezier(.2,.8,.2,1)';side.style.height=h+'px';tmr=setTimeout(settle,300)}else{side.style.transition='none';side.style.height=h+'px';settle()}};
+ const snap=s=>{st=s;S.prefs.sheet=s;save();side.classList.toggle('sheetmin',s==='min');document.body.classList.toggle('sheetmax',s==='max'&&mq.matches);if(mq.matches)apply(pts()[s],true)};
+ const set=()=>{document.body.classList.toggle('sheetmax',st==='max'&&mq.matches);if(mq.matches){side.classList.toggle('sheetmin',st==='min');apply(pts()[st],false)}else{side.style.height='';side.classList.remove('sheetmin');settle()}};
  let y0=null,h0=0,moved=false,t0=0;
- const down=e=>{if(!mq.matches)return;y0=(e.touches?e.touches[0]:e).clientY;h0=side.offsetHeight;moved=false;t0=Date.now();side.style.transition='none'};
- const move=e=>{if(y0==null)return;const y=(e.touches?e.touches[0]:e).clientY,d=y0-y;if(Math.abs(d)>4)moved=true;const P=pts();side.style.height=Math.max(P.min,Math.min(P.max,h0+d))+'px';cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>resize());if(e.cancelable)e.preventDefault()};
+ const down=e=>{if(!mq.matches)return;y0=e.clientY;h0=side.offsetHeight;moved=false;t0=Date.now();side.style.transition='none';clearTimeout(tmr);freeze()};
+ const move=e=>{if(y0==null)return;const d=y0-e.clientY;if(Math.abs(d)>4)moved=true;const P=pts();if(side.classList.contains('sheetmin')&&d>4)side.classList.remove('sheetmin');side.style.height=Math.max(P.min,Math.min(P.max,h0+d))+'px';if(e.cancelable)e.preventDefault()};
  const up=e=>{if(y0==null)return;const P=pts(),h=side.offsetHeight,dt=Date.now()-t0;y0=null;
   if(!moved){snap(st==='min'?'mid':st==='mid'?'min':'mid');return}
   const v=(h-h0)/Math.max(1,dt);let s;if(Math.abs(v)>.6)s=v>0?(h0<P.mid-10?'mid':'max'):(h0>P.mid+10?'mid':'min');else s=['min','mid','max'].reduce((a,b)=>Math.abs(P[b]-h)<Math.abs(P[a]-h)?b:a);snap(s)};
  g.addEventListener('pointerdown',e=>{try{g.setPointerCapture(e.pointerId)}catch(_){}down(e)});g.addEventListener('pointermove',move);g.addEventListener('pointerup',up);g.addEventListener('pointercancel',up);
  document.querySelectorAll('#tabs button').forEach(b=>b.addEventListener('click',()=>{if(st==='min'&&mq.matches)snap('mid')}));
  addEventListener('resize',()=>setTimeout(set,80));window.__sheet=snap;set()})();
+/* aviso de estado del mapa: se desvanece solo */
+(function(){const g=$('gst');if(!g)return;let t=0;const show=()=>{g.style.opacity=1;clearTimeout(t);t=setTimeout(()=>g.style.opacity=0,4500)};new MutationObserver(show).observe(g,{childList:true,characterData:true,subtree:true});show()})();
 
 /* ===== Día D ===== */
 S.dd=S.dd||{};S.dd.c=S.dd.c||{};S.dd.ck=S.dd.ck||{};S.dd.cfg=S.dd.cfg||{};
@@ -687,9 +702,9 @@ function evCsv(){const R=[['fecha','inicio','fin','tipo','nombre','lugar','secci
 function gCsv(){const R=[['fecha','concepto','categoria','monto','forma_pago','proveedor','rfc','folio_fiscal','aportante','evento','factura','evidencia','contrato','permiso_barda','registrado_sif','fecha_registro','presupuestado','pendientes']];S.fz.g.forEach(g=>{const e=g.ev?evGet(g.ev):null;R.push([g.f,g.con,GCAT[g.cat]||'',(+g.m).toFixed(2),GPAGO[g.pago]||'',g.prov,g.rfc,g.uuid,g.ap,e?e.f+' '+e.n:'',g.fac?'si':'no',g.evi?'si':'no',g.ctr?'si':'no',g.per?'si':'no',g.sif?'si':'no',g.sifF||'',g.pl?'si':'no',gReq(g).map(r=>r[1]).join(' | ')])});csvOut('gastos_DL02.csv',R)}
 /* integración con Hoy */
 const _rHoy0=rHoy;rHoy=function(){_rHoy0();if(cur)return;const A=fzAlerts(),red=A.filter(a=>a.l==='r');
- if(A.length)panel.insertAdjacentHTML('afterbegin','<div class="card fzhoy" style="cursor:pointer;border-color:'+(red.length?'#b3261e':'#b58900')+'"><b>📒 Fiscalización: '+A.length+' pendiente'+(A.length>1?'s':'')+'</b><div class="mut">'+esc(A[0].t)+' ›</div></div>');
+ const hs=panel.querySelector('.hstat');if(A.length&&hs)hs.insertAdjacentHTML('beforeend','<button class="pill fzhoy" style="'+(red.length?'background:#b3261e;color:#fff;border-color:#b3261e':'')+'">📒 '+A.length+' pendiente'+(A.length>1?'s':'')+' INE ›</button>');
  const fh=panel.querySelector('.fzhoy');if(fh)fh.onclick=()=>{const g=A[0].go.split(':');agSeg=g[0];if(g[1])evFil=g[1];tab='cal';render()};
- panel.querySelectorAll('.diad').forEach(e=>{e.style.cursor='pointer';e.insertAdjacentHTML('beforeend','<div style="margin-top:6px;font-weight:700">Abrir tablero del Día D ›</div>');e.onclick=()=>{tab='dd';ddv='tab';render()}})};
+ const hd=$('hdd');if(hd)hd.onclick=()=>{tab='dd';ddv='tab';render()}};
 (function(){const q=new URLSearchParams(location.search);if(q.has('rep')){tab='dd';ddv='rep'}})();
 
 /* ===== boot ===== */
