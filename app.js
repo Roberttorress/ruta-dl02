@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded',()=>deEmoji(document.body));
 
 'use strict';
 /* ===== data (injected) ===== */
-const BUILD='b82959f8',_D=window.__D;function dec(a){const o=[];let x=0,y=0;for(let k=0;k<a.length;k+=2){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5])}return o}const DAYS=_D.days.map(d=>{d.coords=dec(d.c);delete d.c;return d}),MERC=_D.merc,NT=_D.NT,OUTER=dec(_D.outer);const SECS=_D.secs.map(x=>{x.rings=x.r.map(dec);delete x.r;return x});const SEG=(()=>{const a=_D.seg,o=[];let x=0,y=0;for(let k=0;k<a.length;k+=4){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5,(x+a[k+2])/1e5,(y+a[k+3])/1e5])}return o})();delete window.__D;
+const BUILD='79e8e055',_D=window.__D;function dec(a){const o=[];let x=0,y=0;for(let k=0;k<a.length;k+=2){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5])}return o}const DAYS=_D.days.map(d=>{d.coords=dec(d.c);delete d.c;return d}),MERC=_D.merc,NT=_D.NT,OUTER=dec(_D.outer);const SECS=_D.secs.map(x=>{x.rings=x.r.map(dec);delete x.r;return x});const SEG=(()=>{const a=_D.seg,o=[];let x=0,y=0;for(let k=0;k<a.length;k+=4){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5,(x+a[k+2])/1e5,(y+a[k+3])/1e5])}return o})();delete window.__D;
 const DIAD='2027-06-06';
 const FN={1:'Fase 1 · Zona a favor',2:'Fase 2 · Zonas en empate',3:'Fase 3 · Zonas por recuperar'},CM={1:'#1d4f9c',2:'#1d4f9c',3:'#1d4f9c'};
 const CAT={FyC:{c:'#1d4f9c',n:'Ganó Fuerza y Corazón',s:'Fuerza y Corazón'},MC:{c:'#f07d00',n:'Ganó MC',s:'MC'},Morena:{c:'#8a1538',n:'Ganó Morena',s:'Morena'},PT:{c:'#d52b1e',n:'Ganó PT',s:'PT'},PVEM:{c:'#2e9d4f',n:'Ganó PVEM',s:'PVEM'},VIDA:{c:'#7b4fa0',n:'Ganó VIDA',s:'VIDA'}};SECS.forEach(x=>{x.cat0=x.cat;const v=[['FyC',x.fyc],['MC',x.mc],['Morena',x.mo],['PT',x.pt],['PVEM',x.pv],['VIDA',x.vi]].sort((a,b)=>b[1]-a[1]);x.cat=v[0][0];x.w2=v[1][0];x.mgv=v[0][1]-v[1][1];x.mg=x.tot?x.mgv/x.tot:0});
@@ -1171,6 +1171,16 @@ const _rMas2=rMas;rMas=function(){_rMas2();if(!(can('usuarios')||!curUser()))ret
  if(q('gsall'))q('gsall').onclick=()=>{if(!confirm('¿Volver a mandar todas las gestorías de este teléfono a la hoja?'))return;S.gsSent={};_save0g(true);gsFlush()};
  if(q('gsoff'))q('gsoff').onclick=()=>{if(!confirm('¿Desconectar este teléfono de la hoja? Lo ya enviado se queda en la hoja.'))return;delete S.prefs.gs;_save0g(true);render()};
  if(q('gslink'))q('gslink').onclick=async()=>{const l=gsLink(),t='Abre este enlace en tu teléfono para conectar la app DL02 a la hoja de gestorías (no lo compartas fuera del equipo):\n'+l;if(navigator.share){try{await navigator.share({text:t});return}catch(e){}}try{await navigator.clipboard.writeText(l);toast('Enlace copiado')}catch(e){prompt('Copia este enlace',l)}}};
+/* ===== Llamar / WhatsApp al ciudadano desde la ficha ===== */
+const _openPet8=openPet;openPet=function(c){_openPet8(c);if(c.k!=='Petición'||!can('gestorias_datos'))return;const sg=document.getElementById('sg');if(!sg)return;const box=sg.querySelector('.sgbox');if(!box)return;
+ const tel=(c.tel||'').replace(/\D/g,'');const d=document.createElement('div');d.className='sgcall';
+ if(tel){d.innerHTML='<a class="sgc1" id="sgcall" href="tel:'+tel+'">'+svgIc('phone')+' Llamar</a><a class="sgc2" id="sgwa2" target="_blank" rel="noopener" href="'+sgWa(c)+'">'+svgIc('msg')+' WhatsApp</a>';box.appendChild(d);
+  const ed=can('gestorias_editar');const pick=t=>{if(!ed)return;sgTipo=t;document.querySelectorAll('#sgtipos button').forEach(x=>x.classList.toggle('on',x.dataset.t===t));const ta=document.getElementById('sgtxt');if(ta)ta.placeholder=t==='llamada'?'¿Qué dijo en la llamada? Ej. Confirma que siguen sin agua':'¿Qué le escribiste o qué contestó?'};
+  $('sgcall').addEventListener('click',()=>{pick('llamada');if(ed){(c.seg=c.seg||[]).push({ts:Date.now(),tipo:'llamada',txt:'Se marcó al ciudadano',by:meName()});save()}});
+  $('sgwa2').addEventListener('click',()=>{pick('wa');if(ed){(c.seg=c.seg||[]).push({ts:Date.now(),tipo:'wa',txt:'Se le escribió por WhatsApp ('+ETN[etOf(c)]+')',by:meName()});save()}});
+  const old=document.getElementById('sgwa');if(old)old.remove()}
+ else{d.innerHTML='<div class="mut" style="font-size:13px">'+svgIc('phone')+' Sin teléfono'+(c.ok===false&&c.nom?' (no dio permiso de contacto)':'')+'</div>';box.appendChild(d)}};
+document.head.insertAdjacentHTML('beforeend','<style>.sgcall{display:flex;gap:8px;margin-top:10px}.sgcall a{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;border-radius:12px;font-weight:700;font-size:16px;text-decoration:none;color:#fff}.sgcall .sgc1{background:#1d4f9c}.sgcall .sgc2{background:#1a9d2b}.sgcall .ic{width:20px;height:20px;margin:0}.sgcall .mut .ic{width:14px;height:14px;vertical-align:-2px}</style>');
 
 /* ===== boot ===== */
 window.addEventListener('online',()=>{useTiles=true;tileFail=0;reqDraw()});window.addEventListener('offline',()=>{useTiles=false;reqDraw()});
