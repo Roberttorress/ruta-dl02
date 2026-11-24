@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded',()=>deEmoji(document.body));
 
 'use strict';
 /* ===== data (injected) ===== */
-const BUILD='4e1dc4da',_D=window.__D;function dec(a){const o=[];let x=0,y=0;for(let k=0;k<a.length;k+=2){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5])}return o}const DAYS=_D.days.map(d=>{d.coords=dec(d.c);delete d.c;return d}),MERC=_D.merc,NT=_D.NT,OUTER=dec(_D.outer);const SECS=_D.secs.map(x=>{x.rings=x.r.map(dec);delete x.r;return x});const SEG=(()=>{const a=_D.seg,o=[];let x=0,y=0;for(let k=0;k<a.length;k+=4){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5,(x+a[k+2])/1e5,(y+a[k+3])/1e5])}return o})();delete window.__D;
+const BUILD='12c1cdf4',_D=window.__D;function dec(a){const o=[];let x=0,y=0;for(let k=0;k<a.length;k+=2){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5])}return o}const DAYS=_D.days.map(d=>{d.coords=dec(d.c);delete d.c;return d}),MERC=_D.merc,NT=_D.NT,OUTER=dec(_D.outer);const SECS=_D.secs.map(x=>{x.rings=x.r.map(dec);delete x.r;return x});const SEG=(()=>{const a=_D.seg,o=[];let x=0,y=0;for(let k=0;k<a.length;k+=4){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5,(x+a[k+2])/1e5,(y+a[k+3])/1e5])}return o})();delete window.__D;
 const DIAD='2027-06-06';
 const FN={1:'Fase 1 · Zona a favor',2:'Fase 2 · Zonas en empate',3:'Fase 3 · Zonas por recuperar'},CM={1:'#1d4f9c',2:'#1d4f9c',3:'#1d4f9c'};
 const CAT={FyC:{c:'#1d4f9c',n:'Ganó Fuerza y Corazón',s:'Fuerza y Corazón'},MC:{c:'#f07d00',n:'Ganó MC',s:'MC'},Morena:{c:'#8a1538',n:'Ganó Morena',s:'Morena'},PT:{c:'#d52b1e',n:'Ganó PT',s:'PT'},PVEM:{c:'#2e9d4f',n:'Ganó PVEM',s:'PVEM'},VIDA:{c:'#7b4fa0',n:'Ganó VIDA',s:'VIDA'}};SECS.forEach(x=>{x.cat0=x.cat;const v=[['FyC',x.fyc],['MC',x.mc],['Morena',x.mo],['PT',x.pt],['PVEM',x.pv],['VIDA',x.vi]].sort((a,b)=>b[1]-a[1]);x.cat=v[0][0];x.w2=v[1][0];x.mgv=v[0][1]-v[1][1];x.mg=x.tot?x.mgv/x.tot:0});
@@ -1199,6 +1199,16 @@ const _openPet9=openPet;openPet=function(c){_openPet9(c);if(c.k!=='Petición')re
 const _gsRow9=gsRow;gsRow=function(c){const r=_gsRow9(c);return r};
 document.head.insertAdjacentHTML('beforeend','<style>#cby{display:flex;align-items:center;gap:10px;margin:0 0 10px;font-size:14px;font-weight:600}#cby span{flex:none}#cby select{flex:1;margin:0;padding:10px}#cby select.need{border-color:#d93025;box-shadow:0 0 0 3px #d9302533}'+
 '.sgwho{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 6px}.sgwho>div{display:flex;gap:8px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 10px}.sgwho>div>.ic{width:18px;height:18px;margin:2px 0 0;flex:none;color:var(--b)}.sgwho>div>span{display:flex;flex-direction:column;min-width:0;font-size:14px;line-height:1.3}.sgwho .mut{font-size:12px}</style>');
+/* ===== Quien recibe = la cuenta con la que se entró (sin preguntar) ===== */
+capLocUI=function(){_capLocUI8();const loc=document.getElementById('cloc');if(!loc||document.getElementById('cby2'))return;const u=curUser();const d=document.createElement('div');d.id='cby2';
+ d.innerHTML=svgIc('user')+(u?'<span>La recibe <b>'+esc(u.n)+'</b> · '+new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'})+'</span>':'<span style="color:#d93025">No has iniciado sesión: se guardará sin nombre</span>');loc.after(d)};
+saveCap=async function(){const n0=S.caps.length;await _saveCap8();if(S.caps.length>n0){const r=S.caps[S.caps.length-1],u=curUser();r.by=u?u.n:'Sin usuario';save(true)}};
+meName=function(){const u=typeof curUser==='function'&&curUser();return u?u.n:'Sin usuario'};
+/* inicio de sesión al abrir la app si este teléfono no tiene usuario */
+function loginGate(){if(curUser()||navigator.webdriver||window.MAE)return;const A=(S.users||[]).filter(u=>u.on);if(!A.length)return;switchUser();const h=document.querySelector('#mbox h2');if(h){h.textContent='Inicia sesión';h.insertAdjacentHTML('afterend','<p class="mut" style="margin:-4px 0 10px">Elige tu nombre. Las gestorías que levantes quedarán registradas a tu nombre.</p>')}
+ const x=$('mclose');if(x)x.style.visibility='hidden';const ob=new MutationObserver(()=>{if(getComputedStyle($('modal')).display==='none'){if(x)x.style.visibility='';ob.disconnect();if(!curUser())setTimeout(loginGate,300)}});ob.observe($('modal'),{attributes:true,attributeFilter:['style']})}
+setTimeout(loginGate,900);
+document.head.insertAdjacentHTML('beforeend','<style>#cby2{display:flex;align-items:center;gap:8px;font-size:14px;margin:0 0 10px;padding:0 2px}#cby2 .ic{width:16px;height:16px;margin:0;color:var(--b)}</style>');
 
 /* ===== boot ===== */
 window.addEventListener('online',()=>{useTiles=true;tileFail=0;reqDraw()});window.addEventListener('offline',()=>{useTiles=false;reqDraw()});
