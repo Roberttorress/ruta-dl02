@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded',()=>deEmoji(document.body));
 
 'use strict';
 /* ===== data (injected) ===== */
-const BUILD='605c4062',_D=window.__D;function dec(a){const o=[];let x=0,y=0;for(let k=0;k<a.length;k+=2){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5])}return o}const DAYS=_D.days.map(d=>{d.coords=dec(d.c);delete d.c;return d}),MERC=_D.merc,NT=_D.NT,OUTER=dec(_D.outer);const SECS=_D.secs.map(x=>{x.rings=x.r.map(dec);delete x.r;return x});const SEG=(()=>{const a=_D.seg,o=[];let x=0,y=0;for(let k=0;k<a.length;k+=4){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5,(x+a[k+2])/1e5,(y+a[k+3])/1e5])}return o})();delete window.__D;
+const BUILD='45f08688',_D=window.__D;function dec(a){const o=[];let x=0,y=0;for(let k=0;k<a.length;k+=2){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5])}return o}const DAYS=_D.days.map(d=>{d.coords=dec(d.c);delete d.c;return d}),MERC=_D.merc,NT=_D.NT,OUTER=dec(_D.outer);const SECS=_D.secs.map(x=>{x.rings=x.r.map(dec);delete x.r;return x});const SEG=(()=>{const a=_D.seg,o=[];let x=0,y=0;for(let k=0;k<a.length;k+=4){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5,(x+a[k+2])/1e5,(y+a[k+3])/1e5])}return o})();delete window.__D;
 const DIAD='2027-06-06';
 const FN={1:'Fase 1 · Zona a favor',2:'Fase 2 · Zonas en empate',3:'Fase 3 · Zonas por recuperar'},CM={1:'#1d4f9c',2:'#1d4f9c',3:'#1d4f9c'};
 const CAT={FyC:{c:'#1d4f9c',n:'Ganó Fuerza y Corazón',s:'Fuerza y Corazón'},MC:{c:'#f07d00',n:'Ganó MC',s:'MC'},Morena:{c:'#8a1538',n:'Ganó Morena',s:'Morena'},PT:{c:'#d52b1e',n:'Ganó PT',s:'PT'},PVEM:{c:'#2e9d4f',n:'Ganó PVEM',s:'PVEM'},VIDA:{c:'#7b4fa0',n:'Ganó VIDA',s:'VIDA'}};SECS.forEach(x=>{x.cat0=x.cat;const v=[['FyC',x.fyc],['MC',x.mc],['Morena',x.mo],['PT',x.pt],['PVEM',x.pv],['VIDA',x.vi]].sort((a,b)=>b[1]-a[1]);x.cat=v[0][0];x.w2=v[1][0];x.mgv=v[0][1]-v[1][1];x.mg=x.tot?x.mgv/x.tot:0});
@@ -1004,6 +1004,10 @@ function demoSeed(){let r=7;const rnd=()=>(r=(r*16807)%2147483647)/2147483647;co
   const g=DEMO_G[i%DEMO_G.length],st=sts[i%10];S.caps.push({id:'demo'+i,demo:1,k:'Petición',cat:g[0],t:g[1],st,urg:(i%7===0&&st!=='res')?'urgente':'normal',nom:'Vecino de prueba '+(i+1),tel:'',ok:true,dir:'',ts:now-Math.floor(rnd()*20*864e5),sec:x.s,lon:+p[0].toFixed(5),lat:+p[1].toFixed(5),hist:st==='res'?[{st:'res',ts:now}]:[]})}}
 if(!S.prefs.demo30){S.prefs.demo30=1;if(!S.caps.some(k=>k.demo))demoSeed();save(true);setTimeout(()=>{try{reqDraw()}catch(e){}},50)}
 const _clearTest0=clearTest;clearTest=function(){const n=S.caps.filter(k=>k.demo).length;if(n&&confirm('¿Quitar las '+n+' gestorías de ejemplo?')){S.caps=S.caps.filter(k=>!k.demo);save(true);reqDraw();toast('Gestorías de ejemplo quitadas');try{render()}catch(e){}return}_clearTest0()};
+/* ===== Botón para mostrar/ocultar gestorías en el mapa normal ===== */
+(function(){const gp=$('gps');if(!gp)return;const b=document.createElement('button');b.id='gbtn';b.setAttribute('aria-label','Mostrar gestorías');b.innerHTML=svgIc('msg');const up=()=>b.classList.toggle('on',!S.prefs.gOff);up();
+ b.onclick=()=>{S.prefs.gOff=!S.prefs.gOff;save();up();toast(S.prefs.gOff?'Gestorías ocultas en el mapa':'Gestorías visibles en el mapa');reqDraw()};gp.insertBefore(b,gp.firstChild)})();
+const _drawCallouts0=drawCallouts;drawCallouts=function(){if(!window.MAE&&S.prefs.gOff){gHits=[];return}_drawCallouts0()};
 
 /* ===== boot ===== */
 window.addEventListener('online',()=>{useTiles=true;tileFail=0;reqDraw()});window.addEventListener('offline',()=>{useTiles=false;reqDraw()});
