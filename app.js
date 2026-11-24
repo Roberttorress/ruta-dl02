@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded',()=>deEmoji(document.body));
 
 'use strict';
 /* ===== data (injected) ===== */
-const BUILD='45f08688',_D=window.__D;function dec(a){const o=[];let x=0,y=0;for(let k=0;k<a.length;k+=2){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5])}return o}const DAYS=_D.days.map(d=>{d.coords=dec(d.c);delete d.c;return d}),MERC=_D.merc,NT=_D.NT,OUTER=dec(_D.outer);const SECS=_D.secs.map(x=>{x.rings=x.r.map(dec);delete x.r;return x});const SEG=(()=>{const a=_D.seg,o=[];let x=0,y=0;for(let k=0;k<a.length;k+=4){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5,(x+a[k+2])/1e5,(y+a[k+3])/1e5])}return o})();delete window.__D;
+const BUILD='b22523a4',_D=window.__D;function dec(a){const o=[];let x=0,y=0;for(let k=0;k<a.length;k+=2){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5])}return o}const DAYS=_D.days.map(d=>{d.coords=dec(d.c);delete d.c;return d}),MERC=_D.merc,NT=_D.NT,OUTER=dec(_D.outer);const SECS=_D.secs.map(x=>{x.rings=x.r.map(dec);delete x.r;return x});const SEG=(()=>{const a=_D.seg,o=[];let x=0,y=0;for(let k=0;k<a.length;k+=4){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5,(x+a[k+2])/1e5,(y+a[k+3])/1e5])}return o})();delete window.__D;
 const DIAD='2027-06-06';
 const FN={1:'Fase 1 · Zona a favor',2:'Fase 2 · Zonas en empate',3:'Fase 3 · Zonas por recuperar'},CM={1:'#1d4f9c',2:'#1d4f9c',3:'#1d4f9c'};
 const CAT={FyC:{c:'#1d4f9c',n:'Ganó Fuerza y Corazón',s:'Fuerza y Corazón'},MC:{c:'#f07d00',n:'Ganó MC',s:'MC'},Morena:{c:'#8a1538',n:'Ganó Morena',s:'Morena'},PT:{c:'#d52b1e',n:'Ganó PT',s:'PT'},PVEM:{c:'#2e9d4f',n:'Ganó PVEM',s:'PVEM'},VIDA:{c:'#7b4fa0',n:'Ganó VIDA',s:'VIDA'}};SECS.forEach(x=>{x.cat0=x.cat;const v=[['FyC',x.fyc],['MC',x.mc],['Morena',x.mo],['PT',x.pt],['PVEM',x.pv],['VIDA',x.vi]].sort((a,b)=>b[1]-a[1]);x.cat=v[0][0];x.w2=v[1][0];x.mgv=v[0][1]-v[1][1];x.mg=x.tot?x.mgv/x.tot:0});
@@ -877,9 +877,9 @@ rCap=function(){capF.st=capFilter||'all';const p=S.caps.filter(c=>c.k==='Petici�
  const cl=$('cfclr');if(cl)cl.onclick=e=>{e.preventDefault();capF={st:capF.st,sec:'all',col:'all',cat:'all',q:''};rCap()};$('gxls').onclick=gestXlsx;bindPets(panel)};
 if(typeof capFilter!=='undefined'&&capFilter!=='all')capF.st=capFilter;
 function gestXlsx(){if(!can('exportar')){toast('Sin permiso para exportar');return}const datos=can('gestorias_datos'),now=Date.now();
- const H=['Folio','Fecha','Tipo','Urgencia','Estatus','Días abierta','Sección','Colonia','Dirección'].concat(datos?['Nombre','Teléfono','Acepta contacto']:[],['Detalle','Fotos','Mapa']);
- const row=c=>{const d=Math.floor(((c.st==='res'&&c.hist?(c.hist.filter(h=>h.st==='res').pop()||{}).ts:now)-c.ts)/864e5);return ['G-'+String(c.id).slice(-6),new Date(c.ts).toLocaleString('es-MX',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),c.cat||KL(c.k),c.urg==='urgente'?'Urgente':'Normal',c.st?STAT[c.st][0]:'',isFinite(d)?d:'',c.sec?pad(c.sec):'',gCol(c),c.dir||''].concat(datos?[c.nom||'',c.tel||'',c.ok?'Sí':'No']:[],[(c.t||'').replace(/\s+/g,' '),c.photos||0,c.lat?'https://maps.google.com/?q='+c.lat+','+c.lon:''])};
- const base=gestFiltered().filter(c=>c.k==='Petición'&&!c.test),W=[10,17,14,10,12,8,9,26,26].concat(datos?[22,13,10]:[],[50,7,40]);
+ const H=['Folio','Fecha','Tipo','Urgencia','Estatus','Etapa','Responsable','Dependencia','Folio dependencia','Fecha compromiso','Seguimientos','Último seguimiento','Días abierta','Sección','Colonia','Dirección'].concat(datos?['Nombre','Teléfono','Acepta contacto']:[],['Detalle','Fotos','Mapa']);
+ const row=c=>{const d=Math.floor(((c.st==='res'&&c.hist?(c.hist.filter(h=>h.st==='res').pop()||{}).ts:now)-c.ts)/864e5);return ['G-'+String(c.id).slice(-6),new Date(c.ts).toLocaleString('es-MX',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),c.cat||KL(c.k),c.urg==='urgente'?'Urgente':'Normal',c.st?STAT[c.st][0]:'',ETN[etOf(c)],c.resp||'',c.dep||'',c.fol||'',c.fc||'',(c.seg||[]).length,((c.seg||[]).filter(x=>x.tipo!=='et').slice(-1)[0]||{}).txt||'',isFinite(d)?d:'',c.sec?pad(c.sec):'',gCol(c),c.dir||''].concat(datos?[c.nom||'',c.tel||'',c.ok?'Sí':'No']:[],[(c.t||'').replace(/\s+/g,' '),c.photos||0,c.lat?'https://maps.google.com/?q='+c.lat+','+c.lon:''])};
+ const base=gestFiltered().filter(c=>c.k==='Petición'&&!c.test),W=[10,17,14,10,12,16,20,26,14,13,10,40,8,9,26,26].concat(datos?[22,13,10]:[],[50,7,40]);
  const by=st=>[H].concat(base.filter(c=>c.st===st).map(row));const cnt=(f)=>{const m={};base.forEach(c=>{const k=f(c)||'(sin dato)';m[k]=(m[k]||0)+1});return Object.entries(m).sort((a,b)=>b[1]-a[1])};
  const res=[['Resumen de gestorías · Distrito 02',''],['Generado',new Date().toLocaleString('es-MX')],['Filtros',[capF.st!=='all'?'estado '+capF.st:'',capF.cat!=='all'?'tipo '+capF.cat:'',capF.sec!=='all'?'sección '+capF.sec:'',capF.col!=='all'?'colonia '+capF.col:'',capF.q?'búsqueda "'+capF.q+'"':''].filter(Boolean).join(', ')||'ninguno'],['',''],['Total',base.length],['Pendientes',base.filter(c=>c.st==='pend').length],['En gestión',base.filter(c=>c.st==='gest').length],['Resueltas',base.filter(c=>c.st==='res').length],['Urgentes sin resolver',base.filter(c=>c.urg==='urgente'&&c.st!=='res').length],['',''],['Por tipo','']].concat(cnt(c=>c.cat),[['',''],['Por sección','']],cnt(c=>c.sec?'Sección '+pad(c.sec):''),[['',''],['Por colonia','']],cnt(gCol));
  const bold=[];res.forEach((r,i)=>{if(['Por tipo','Por sección','Por colonia','Total'].includes(r[0]))bold.push(i)});
@@ -930,14 +930,14 @@ const CATI={Alumbrado:'bulb',Agua:'drop',Drenaje:'drain',Pavimento:'road',Basura
 const P2={};const icP=n=>P2[n]||(P2[n]=ICN[n].split('|').map(d=>new Path2D(d)));
 let mvSel=null,mvHits=[];
 drawPins=function(){const z=view.z,r=z<13.5?9:z<15?10.5:12;mvHits=[];
- S.caps.forEach(k=>{if(k.k!=='Petición'||!k.lon||k.test)return;const q=proj(k.lon,k.lat);if(q[0]<-30||q[0]>W+30||q[1]<-40||q[1]>H+20)return;const col=STC[k.st]||STC.pend,cy=q[1]-r*2.1,big=mvSel===k;const R=big?r*1.25:r;
+ S.caps.forEach(k=>{if(k.k!=='Petición'||!k.lon||k.test)return;const q=proj(k.lon,k.lat);if(q[0]<-30||q[0]>W+30||q[1]<-40||q[1]>H+20)return;const col=stcK(k),cy=q[1]-r*2.1,big=mvSel===k;const R=big?r*1.25:r;
   ctx.beginPath();ctx.moveTo(q[0],q[1]);ctx.bezierCurveTo(q[0]-R*.45,q[1]-R*.9,q[0]-R,cy+R*.75,q[0]-R,cy);ctx.arc(q[0],cy,R,Math.PI,0);ctx.bezierCurveTo(q[0]+R,cy+R*.75,q[0]+R*.45,q[1]-R*.9,q[0],q[1]);ctx.closePath();
   ctx.fillStyle=col;ctx.shadowColor='#0005';ctx.shadowBlur=5;ctx.shadowOffsetY=1;ctx.fill();ctx.shadowBlur=0;ctx.shadowOffsetY=0;ctx.lineWidth=big?2.5:1.6;ctx.strokeStyle='#fff';ctx.stroke();
   const sc=R*1.15/24;ctx.save();ctx.translate(q[0]-12*sc,cy-12*sc);ctx.scale(sc,sc);ctx.strokeStyle='#fff';ctx.lineWidth=2.4;ctx.lineCap='round';ctx.lineJoin='round';icP(CATI[k.cat]||'pin').forEach(p=>ctx.stroke(p));ctx.restore();
   mvHits.push([q[0],cy,R,k])})}
 function mvTap(x,y){const h=mvHits.slice().reverse().find(a=>Math.hypot(a[0]-x,a[1]-y)<a[2]+6);let c=$('mvpop');
  if(!h){mvSel=null;if(c)c.remove();reqDraw();return true}mvSel=h[3];const k=mvSel;if(!c){c=document.createElement('div');c.id='mvpop';document.body.appendChild(c)}
- const age=Math.floor((Date.now()-k.ts)/864e5);c.innerHTML='<div class="row" style="justify-content:space-between"><b>'+svgIc(CATI[k.cat]||'pin')+' '+esc(k.cat||'Gestoría')+'</b><span class="stpill" style="background:'+(STC[k.st]||STC.pend)+'">'+(STN[k.st]||'Pendiente')+'</span></div>'+
+ const age=Math.floor((Date.now()-k.ts)/864e5);c.innerHTML='<div class="row" style="justify-content:space-between"><b>'+svgIc(CATI[k.cat]||'pin')+' '+esc(k.cat||'Gestoría')+'</b><span class="stpill" style="background:'+(stcK(k))+'">'+(typeof ETN!=='undefined'?ETN[etOf(k)]:STN[k.st])+'</span></div>'+
   '<div class="mut">'+(k.sec?'Sección '+pad(k.sec):'')+(typeof gCol==='function'&&gCol(k)?' · '+esc(gCol(k)):'')+'</div>'+(k.t?'<div style="margin-top:4px">'+esc(k.t)+'</div>':'')+'<div class="mut" style="margin-top:4px">'+new Date(k.ts).toLocaleDateString('es-MX',{day:'numeric',month:'short'})+(k.st!=='res'&&age>=1?' · '+age+' día'+(age>1?'s':'')+' abierta':'')+(k.urg==='urgente'?' · <b style="color:#d93025">Urgente</b>':'')+'</div>';
  const r=cv.getBoundingClientRect();let L=r.left+h[0]-130,T=r.top+h[1]-h[2]-12;c.style.left=Math.max(8,Math.min(innerWidth-268,L))+'px';c.style.top=Math.max(8,T)+'px';c.style.transform='translateY(-100%)';reqDraw();return true}
 /* ===== Casillas georreferenciadas ===== */
@@ -977,8 +977,8 @@ function drawCallouts(){gHits=[];const mae=!!window.MAE;if(!mae&&view.z<13.5)ret
  L.forEach(o=>{const k=o.k,t1=(k.cat||'Gestoría')+(k.urg==='urgente'&&k.st!=='res'?' · Urgente':'');ctx.font='700 '+Math.round(13*big)+'px system-ui';const w1=ctx.measureText(t1).width;ctx.font=Math.round(12*big)+'px system-ui';
   const t2raw=(k.t||'').replace(/\s+/g,' ').trim()||(typeof gCol==='function'?gCol(k):'')||STN[k.st]||'';const w=Math.min(Math.round(230*big),Math.max(w1,Math.min(ctx.measureText(t2raw).width,Math.round(170*big)))+R*2+30);
   const x=o.q[0]-w/2,y=o.q[1]-12-H1;const bx=[x-4,y-4,x+w+4,o.q[1]+4];if((!mae&&y<58)||x<4||x+w>xmax||boxes.some(b=>!(bx[2]<b[0]||bx[0]>b[2]||bx[3]<b[1]||bx[1]>b[3]))){dots.push(o);return}boxes.push(bx);labeled.push({o,x,y,w,t1,t2raw})});
- dots.forEach(o=>{const c=STC[o.k.st]||STC.pend;ctx.beginPath();ctx.arc(o.q[0],o.q[1],7*big,0,7);ctx.fillStyle=c;ctx.shadowColor='#0005';ctx.shadowBlur=4;ctx.fill();ctx.shadowBlur=0;ctx.lineWidth=2;ctx.strokeStyle='#fff';ctx.stroke();gHits.push([o.q[0]-10,o.q[1]-10,o.q[0]+10,o.q[1]+10,o.k])});
- labeled.reverse().forEach(({o,x,y,w,t1,t2raw})=>{const k=o.k,c=STC[k.st]||STC.pend,sel=k===mvSel;
+ dots.forEach(o=>{const c=stcK(o.k);ctx.beginPath();ctx.arc(o.q[0],o.q[1],7*big,0,7);ctx.fillStyle=c;ctx.shadowColor='#0005';ctx.shadowBlur=4;ctx.fill();ctx.shadowBlur=0;ctx.lineWidth=2;ctx.strokeStyle='#fff';ctx.stroke();gHits.push([o.q[0]-10,o.q[1]-10,o.q[0]+10,o.q[1]+10,o.k])});
+ labeled.reverse().forEach(({o,x,y,w,t1,t2raw})=>{const k=o.k,c=stcK(k),sel=k===mvSel;
   ctx.save();ctx.shadowColor='rgba(0,0,0,.28)';ctx.shadowBlur=14;ctx.shadowOffsetY=4;rrect(x,y,w,H1,12);ctx.fillStyle=dk?'#2c2c2e':'#fff';ctx.fill();ctx.restore();
   ctx.beginPath();ctx.moveTo(o.q[0]-7,y+H1-.5);ctx.lineTo(o.q[0],o.q[1]-3);ctx.lineTo(o.q[0]+7,y+H1-.5);ctx.closePath();ctx.fillStyle=dk?'#2c2c2e':'#fff';ctx.fill();
   if(sel){rrect(x,y,w,H1,12);ctx.lineWidth=2.5;ctx.strokeStyle=c;ctx.stroke()}
@@ -993,7 +993,7 @@ drawPins=function(){};
 function gTap(x,y){const h=gHits.slice().reverse().find(a=>x>=a[0]&&x<=a[2]&&y>=a[1]&&y<=a[3]);if(!h)return false;openPet(h[4]);return true}
 mvTap=function(x,y){const h=gHits.slice().reverse().find(a=>x>=a[0]&&x<=a[2]&&y>=a[1]&&y<=a[3]);let c=$('mvpop');
  if(!h){mvSel=null;if(c)c.remove();reqDraw();return true}mvSel=h[4];const k=mvSel;if(!c){c=document.createElement('div');c.id='mvpop';document.body.appendChild(c)}
- const age=Math.floor((Date.now()-k.ts)/864e5);c.innerHTML='<div class="row" style="justify-content:space-between"><b>'+svgIc(CATI[k.cat]||'pin')+' '+esc(k.cat||'Gestoría')+'</b><span class="stpill" style="background:'+(STC[k.st]||STC.pend)+'">'+(STN[k.st]||'Pendiente')+'</span></div><div class="mut">'+(k.sec?'Sección '+pad(k.sec):'')+(typeof gCol==='function'&&gCol(k)?' · '+esc(gCol(k)):'')+'</div>'+(k.t?'<div style="margin-top:4px">'+esc(k.t)+'</div>':'')+'<div class="mut" style="margin-top:4px">'+new Date(k.ts).toLocaleDateString('es-MX',{day:'numeric',month:'short'})+(k.st!=='res'&&age>=1?' · '+age+' día'+(age>1?'s':'')+' abierta':'')+(k.urg==='urgente'?' · <b style="color:#d93025">Urgente</b>':'')+'</div>';
+ const age=Math.floor((Date.now()-k.ts)/864e5);c.innerHTML='<div class="row" style="justify-content:space-between"><b>'+svgIc(CATI[k.cat]||'pin')+' '+esc(k.cat||'Gestoría')+'</b><span class="stpill" style="background:'+(stcK(k))+'">'+(typeof ETN!=='undefined'?ETN[etOf(k)]:STN[k.st])+'</span></div><div class="mut">'+(k.sec?'Sección '+pad(k.sec):'')+(typeof gCol==='function'&&gCol(k)?' · '+esc(gCol(k)):'')+'</div>'+(k.t?'<div style="margin-top:4px">'+esc(k.t)+'</div>':'')+'<div class="mut" style="margin-top:4px">'+new Date(k.ts).toLocaleDateString('es-MX',{day:'numeric',month:'short'})+(k.st!=='res'&&age>=1?' · '+age+' día'+(age>1?'s':'')+' abierta':'')+(k.urg==='urgente'?' · <b style="color:#d93025">Urgente</b>':'')+'</div>';
  const r=cv.getBoundingClientRect();c.style.left=Math.max(8,Math.min(innerWidth-268,r.left+(h[0]+h[2])/2-130))+'px';c.style.top=Math.max(8,r.top+h[1]-8)+'px';c.style.transform='translateY(-100%)';reqDraw();return true};
 /* ===== 30 gestorías de ejemplo (demo:1, se borran con "Borrar datos de prueba") ===== */
 const DEMO_G=[['Agua','Sin agua desde el lunes en toda la cuadra'],['Alumbrado','Tres lámparas apagadas frente a la primaria'],['Pavimento','Bache grande en la esquina, ya poncharon llantas'],['Seguridad','Piden patrullaje por las tardes'],['Basura','El camión no pasa desde hace dos semanas'],['Drenaje','Coladera tapada, se inunda cuando llueve'],['Parques','Juegos de la plaza rotos y sin pintura'],['Salud','Adulta mayor necesita silla de ruedas'],['Empleo','Joven busca trabajo, terminó prepa'],['Regularización','Escrituras de la casa sin regularizar'],['Apoyo','Familia pide apoyo con útiles escolares'],['Alumbrado','Poste con cables colgando'],['Agua','Fuga de agua en la banqueta hace días'],['Pavimento','Calle sin pavimentar, mucho polvo'],['Seguridad','Falta señalamiento en cruce escolar']];
@@ -1008,6 +1008,97 @@ const _clearTest0=clearTest;clearTest=function(){const n=S.caps.filter(k=>k.demo
 (function(){const gp=$('gps');if(!gp)return;const b=document.createElement('button');b.id='gbtn';b.setAttribute('aria-label','Mostrar gestorías');b.innerHTML=svgIc('msg');const up=()=>b.classList.toggle('on',!S.prefs.gOff);up();
  b.onclick=()=>{S.prefs.gOff=!S.prefs.gOff;save();up();toast(S.prefs.gOff?'Gestorías ocultas en el mapa':'Gestorías visibles en el mapa');reqDraw()};gp.insertBefore(b,gp.firstChild)})();
 const _drawCallouts0=drawCallouts;drawCallouts=function(){if(!window.MAE&&S.prefs.gOff){gHits=[];return}_drawCallouts0()};
+
+/* ===== Seguimiento de gestorías: etapas, responsable, dependencia, bitácora ===== */
+const _petHtml0=petHtml,_openPet0=openPet;
+const ETS=[['rec','Recibida','pend'],['can','Canalizada','gest'],['pro','En proceso','gest'],['res','Resuelta','res'],['cer','Cerrada','res']];
+const ETN={rec:'Recibida',can:'Canalizada',pro:'En proceso',res:'Resuelta',cer:'Cerrada · ciudadano avisado',np:'No procede'};
+const ETST={rec:'pend',can:'gest',pro:'gest',res:'res',cer:'res',np:'res'};
+const ETC={rec:'#d93025',can:'#f29900',pro:'#e37400',res:'#1a9d2b',cer:'#137333',np:'#80868b'};
+const ETNEXT={rec:'can',can:'pro',pro:'res',res:'cer'};
+const ETBTN={can:'Canalizar a dependencia',pro:'Marcar en proceso',res:'Marcar resuelta',cer:'Cerrar: ciudadano avisado'};
+const DEPS=['Servicios Públicos (Monterrey)','Agua y Drenaje de Monterrey','Desarrollo Urbano','Obras Públicas','Seguridad y Protección Ciudadana','Tránsito','Protección Civil','Ecología / Parques','DIF','Salud','Desarrollo Social','CFE','Gobierno del Estado','Oficina del diputado (directo)','Otra'];
+const SGT=[['nota','Nota','pencil'],['llamada','Llamada','phone'],['visita','Visita','walk'],['oficio','Oficio','file'],['wa','WhatsApp','msg']];
+function etOf(c){if(c.et&&ETN[c.et])return c.et;return c.st==='res'?'res':c.st==='gest'?(c.dep?'can':'pro'):'rec'}
+function stcK(k){return ETC[etOf(k)]||STC[k.st]||STC.pend}
+function meName(){const u=typeof curUser==='function'&&curUser();return u?u.n:'Equipo'}
+function dayN(t){return Math.floor(t/864e5)}
+function sgLog(c){const L=(c.seg||[]).slice();if(!c.seg&&c.hist)c.hist.forEach((h,i)=>{if(i)L.push({ts:h.ts,tipo:'et',et:h.st==='pend'?'rec':h.st==='gest'?'pro':'res'})});
+ L.push({ts:c.ts,tipo:'alta'});return L.sort((a,b)=>b.ts-a.ts)}
+function vencida(c){return c.fc&&ETST[etOf(c)]!=='res'&&new Date(c.fc+'T23:59:59')<new Date()}
+function setEt(c,et,txt){c.et=et;c.st=ETST[et];(c.hist=c.hist||[]).push({st:c.st,ts:Date.now()});(c.seg=c.seg||[]).push({ts:Date.now(),tipo:'et',et,txt:txt||'',by:meName()});save()}
+function stepper(c){const e=etOf(c);if(e==='np')return '<div class="sgst np">'+svgIc('ban')+' No procede</div>';const i=ETS.findIndex(x=>x[0]===e);
+ return '<div class="sgst">'+ETS.map((x,j)=>'<div class="sgs'+(j<i?' done':j===i?' cur':'')+'" style="--c:'+ETC[x[0]]+'"><i></i><span>'+x[1]+'</span></div>').join('')+'</div>'}
+function sgWa(c){if(!c.tel)return null;const tel=c.tel.length===10?'52'+c.tel:c.tel,f=(c.nom||'').split(' ')[0],w=(c.cat||'').toLowerCase()+(c.dir?' en '+c.dir:''),e=etOf(c);
+ const m={rec:'Hola '+f+', soy del equipo de David de la Peña. Tu gestoría de '+w+' quedó registrada y te avisamos en cuanto haya avance.',can:'Hola '+f+', tu gestoría de '+w+' ya se canalizó a '+(c.dep||'la dependencia')+(c.fol?' con el folio '+c.fol:'')+'. Le damos seguimiento.',pro:'Hola '+f+', tu gestoría de '+w+' ya está en atención'+(c.dep?' por '+c.dep:'')+'. Te mantenemos al tanto.',res:'Hola '+f+', tu gestoría de '+w+' quedó resuelta. ¿Nos confirmas que todo quedó bien?',cer:'Hola '+f+', gracias por confirmarnos. Aquí seguimos para lo que necesites.',np:'Hola '+f+', revisamos tu gestoría de '+w+' y por ahora no fue posible atenderla por esta vía. Te explicamos los detalles por aquí.'};
+ return 'https://wa.me/'+tel+'?text='+encodeURIComponent(m[e])}
+/* tarjeta compacta para la lista */
+petHtml=function(c){if(c.k!=='Petición')return _petHtml0(c);const e=etOf(c),age=dayN(Date.now()-c.ts),cerr=ETST[e]==='res',last=(c.seg||[]).filter(s=>s.tipo!=='et').slice(-1)[0];
+ return '<div class="sgcard" data-id="'+c.id+'" data-open="1"><div class="h"><b>'+svgIc(CATI[c.cat]||'pin')+' '+esc(c.cat||'Gestoría')+(c.urg==='urgente'&&!cerr?' <span class="pill" style="background:#b3261e">URGENTE</span>':'')+(c.demo?' <span style="background:#80868b22;color:#5f6368;font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px;vertical-align:2px">PRUEBA</span>':'')+'</b><span class="stpill" style="background:'+ETC[e]+'">'+(e==='cer'?'Cerrada':ETN[e])+'</span></div>'+
+ '<div class="sgdesc">'+esc(c.t||'')+'</div>'+(c.nom&&can('gestorias_datos')?'<div class="mut" style="font-size:13px">'+svgIc('user')+' '+esc(c.nom)+(c.tel?' · '+c.tel:'')+'</div>':'')+stepper(c)+
+ '<div class="mut sgmeta">'+(c.sec?'Secc. '+pad(c.sec)+(gCol(c)?' · '+esc(gCol(c)):''):'')+(c.dep?' · '+esc(c.dep):'')+(c.resp?' · '+svgIc('user')+esc(c.resp):'')+'</div>'+
+ '<div class="sgfoot">'+(vencida(c)?'<b class="warn">Compromiso vencido</b>':c.fc&&!cerr?'Compromiso '+new Date(c.fc+'T12:00').toLocaleDateString('es-MX',{day:'numeric',month:'short'}):'')+(!cerr?'<span class="'+(age>=7?'warn':'')+'">'+age+' día'+(age===1?'':'s')+' abierta</span>':'<span>'+svgIc('check')+' '+((c.seg||[]).length)+' seguimientos</span>')+'</div>'+
+ (last?'<div class="sglast">'+svgIc((SGT.find(t=>t[0]===last.tipo)||['','','pencil'])[2])+' '+esc(last.txt).slice(0,90)+'</div>':'')+'</div>'};
+const _bindPets0=bindPets;bindPets=function(root){root.querySelectorAll('.sgcard').forEach(el=>{const c=S.caps.find(x=>x.id===el.dataset.id);if(c)el.onclick=()=>openPet(c)});_bindPets0(root)};
+/* ficha completa de seguimiento */
+let sgTipo='nota';
+openPet=function(c){if(c.k!=='Petición'){_openPet0(c);return}const e=etOf(c),ed=can('gestorias_editar'),datos=can('gestorias_datos'),cerr=ETST[e]==='res',nx=ETNEXT[e],age=dayN(Date.now()-c.ts);
+ const users=(S.users||[]).filter(u=>u.on).map(u=>u.n);if(c.resp&&!users.includes(c.resp))users.push(c.resp);
+ const dis=ed?'':' disabled';
+ let h='<div id="sg" data-id="'+c.id+'"><div class="sghd"><div class="sgic" style="background:'+ETC[e]+'">'+svgIc(CATI[c.cat]||'pin')+'</div><div style="flex:1;min-width:0"><div class="sgt">'+esc(c.cat||'Gestoría')+(c.urg==='urgente'&&!cerr?' <span class="pill" style="background:#b3261e">URGENTE</span>':'')+'</div><div class="mut">G-'+String(c.id).slice(-6)+' · '+new Date(c.ts).toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'})+(cerr?'':' · '+age+' día'+(age===1?'':'s')+' abierta')+'</div></div><span class="stpill" style="background:'+ETC[e]+'">'+(e==='cer'?'Cerrada':ETN[e])+'</span></div>'+
+ stepper(c)+
+ (vencida(c)?'<div class="sgalert">'+svgIc('alert')+' La fecha compromiso ya pasó. Actualiza el seguimiento o ajusta la fecha.</div>':'')+
+ '<div class="sgbox"><div class="sgdesc big">'+esc(c.t||'Sin descripción')+'</div>'+((c.nom||c.dir)&&datos?'<div class="sgrow">'+svgIc('user')+'<div>'+(c.nom?'<b>'+esc(c.nom)+'</b>'+(c.tel?' · <a href="tel:'+c.tel+'">'+c.tel+'</a>':''):'')+(c.dir?'<div class="mut">'+esc(c.dir)+'</div>':'')+'</div></div>':'')+
+ '<div class="sgrow">'+svgIc('mappin')+'<div>'+(c.sec?'Sección '+pad(c.sec):'Sin sección')+(gCol(c)?' · '+esc(gCol(c)):'')+'</div></div><div id="ph_'+c.id+'"></div></div>'+
+ (nx&&ed?'<button class="btn" id="sgnext" style="background:'+ETC[nx]+'">'+svgIc(nx==='res'||nx==='cer'?'check':'up')+' '+ETBTN[nx]+'</button>':'')+
+ '<div class="sgh">Datos del seguimiento</div><div class="sgbox sgform">'+
+ '<label>Responsable<select id="sgresp"'+dis+'><option value="">— Sin asignar —</option>'+users.map(n=>'<option'+(n===c.resp?' selected':'')+'>'+esc(n)+'</option>').join('')+'</select></label>'+
+ '<label>Dependencia<select id="sgdep"'+dis+'><option value="">— Aún no se canaliza —</option>'+DEPS.map(n=>'<option'+(n===c.dep?' selected':'')+'>'+esc(n)+'</option>').join('')+'</select></label>'+
+ '<div class="sg2"><label>Folio de la dependencia<input id="sgfol" placeholder="Ej. 072-12345" value="'+esc(c.fol||'')+'"'+dis+'></label><label>Fecha compromiso<input id="sgfc" type="date" value="'+(c.fc||'')+'"'+dis+'></label></div></div>'+
+ (ed?'<div class="sgh">Agregar seguimiento</div><div class="sgbox"><div class="chips" id="sgtipos">'+SGT.map(t=>'<button data-t="'+t[0]+'" class="'+(t[0]===sgTipo?'on':'')+'">'+svgIc(t[2])+' '+t[1]+'</button>').join('')+'</div><textarea id="sgtxt" rows="2" placeholder="¿Qué se hizo? Ej. Se llamó a Servicios Públicos, quedan de venir el jueves"></textarea><button class="btn sec" id="sgadd">'+svgIc('plus')+' Guardar seguimiento</button></div>':'')+
+ '<div class="sgh">Historial</div><div class="sgtl">'+sgLog(c).map(s=>{const t=SGT.find(x=>x[0]===s.tipo);const col=s.tipo==='et'?ETC[s.et]:s.tipo==='alta'?'#1d4f9c':'#5f6368';
+  const ttl=s.tipo==='alta'?'Gestoría registrada':s.tipo==='et'?ETN[s.et]:t?t[1]:'Nota';return '<div class="sgi" style="--c:'+col+'"><i>'+svgIc(s.tipo==='alta'?'plus':s.tipo==='et'?'flag':t?t[2]:'pencil')+'</i><div><b>'+ttl+'</b>'+(s.txt?'<div>'+esc(s.txt)+'</div>':'')+'<div class="mut">'+new Date(s.ts).toLocaleString('es-MX',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})+(s.by?' · '+esc(s.by):'')+'</div></div></div>'}).join('')+'</div>'+
+ '<div class="acts sgacts">'+(datos&&sgWa(c)?'<a target="_blank" rel="noopener" id="sgwa" href="'+sgWa(c)+'">'+svgIc('msg')+' Avisar al ciudadano</a>':'')+(c.lat?'<button id="sggo">'+svgIc('map')+' Ver en mapa</button>':'')+'<button id="sgsh">'+svgIc('share')+' Compartir</button>'+
+ (ed&&e!=='np'&&!cerr?'<button id="sgnp">'+svgIc('ban')+' No procede</button>':'')+(ed&&cerr?'<button id="sgre">'+svgIc('refresh')+' Reabrir</button>':'')+(can('borrar')?'<button id="sgdel" class="warn">'+svgIc('trash')+' Borrar</button>':'')+'</div>'+
+ '<button class="btn sec" id="sgclose">Cerrar</button></div>';
+ $('mbox').innerHTML=h;$('modal').style.display='flex';$('mbox').scrollTop=0;
+ for(let i=0;i<(c.photos||0);i++)getPhoto(c.id+'_'+i).then(b=>{if(!b)return;const im=document.createElement('img');im.className='thumb';im.src=URL.createObjectURL(b);im.onclick=()=>{$('photoimg').src=im.src;$('photo').style.display='flex'};const ph=document.getElementById('ph_'+c.id);if(ph)ph.appendChild(im)});
+ const re=()=>{openPet(c);try{reqDraw()}catch(e){}};const q=id=>document.getElementById(id);
+ q('sgclose').onclick=()=>{closeModal();try{if(tab==='cap')render()}catch(e){}};
+ if(q('sgnext'))q('sgnext').onclick=()=>{if(nx==='can'&&!c.dep){const d=q('sgdep');d.focus();d.classList.add('need');toast('Elige la dependencia a la que se canaliza');return}
+  let txt='';if(nx==='can')txt='A '+c.dep+(c.fol?' · folio '+c.fol:'');if(nx==='res'){txt=prompt('¿Cómo se resolvió? (opcional)')||''}setEt(c,nx,txt);toast(ETN[nx]);re()};
+ const fld=(id,key,lbl)=>{const el=q(id);if(!el||!ed)return;el.onchange=()=>{const v=el.value.trim(),old=c[key]||'';if(v===old)return;c[key]=v;(c.seg=c.seg||[]).push({ts:Date.now(),tipo:'nota',txt:lbl+': '+(v?(key==='fc'?new Date(v+'T12:00').toLocaleDateString('es-MX',{day:'numeric',month:'long'}):v):'(sin dato)'),by:meName()});
+  if(key==='dep'&&v&&etOf(c)==='rec'){setEt(c,'can','A '+v)}else save();re()}};
+ fld('sgresp','resp','Responsable');fld('sgdep','dep','Dependencia');fld('sgfol','fol','Folio');fld('sgfc','fc','Fecha compromiso');
+ document.querySelectorAll('#sgtipos button').forEach(b=>b.onclick=()=>{sgTipo=b.dataset.t;document.querySelectorAll('#sgtipos button').forEach(x=>x.classList.toggle('on',x===b))});
+ if(q('sgadd'))q('sgadd').onclick=()=>{const t=q('sgtxt').value.trim();if(!t){toast('Escribe qué se hizo');q('sgtxt').focus();return}(c.seg=c.seg||[]).push({ts:Date.now(),tipo:sgTipo,txt:t,by:meName()});if(etOf(c)==='rec'&&sgTipo!=='nota')setEt(c,'pro','');else save();toast('Seguimiento guardado');re()};
+ if(q('sgwa'))q('sgwa').addEventListener('click',()=>{(c.seg=c.seg||[]).push({ts:Date.now(),tipo:'wa',txt:'Se avisó al ciudadano por WhatsApp ('+ETN[etOf(c)]+')',by:meName()});save()});
+ if(q('sggo'))q('sggo').onclick=()=>{closeModal();if(tab!=='hoy'){tab='hoy';try{render()}catch(e){}}view.lon=c.lon;view.lat=c.lat;view.z=17.5;try{setFollow(false);__sheet('min')}catch(e){}reqDraw()};
+ q('sgsh').onclick=()=>sharePet(c);
+ if(q('sgnp'))q('sgnp').onclick=()=>{const t=prompt('¿Por qué no procede?');if(t===null)return;setEt(c,'np',t);re()};
+ if(q('sgre'))q('sgre').onclick=()=>{setEt(c,c.dep?'pro':'rec','Reabierta');re()};
+ if(q('sgdel'))q('sgdel').onclick=()=>{if(confirm('¿Borrar esta gestoría?')){S.caps=S.caps.filter(x=>x!==c);save();closeModal();try{render();reqDraw()}catch(e){}}}};
+document.head.insertAdjacentHTML('beforeend','<style>'+
+'#sg .sghd{display:flex;gap:12px;align-items:center;margin:2px 0 10px}#sg .sgic{width:46px;height:46px;border-radius:23px;display:flex;align-items:center;justify-content:center;color:#fff;flex:none}#sg .sgic .ic{width:24px;height:24px;margin:0}'+
+'#sg .sgt{font-size:20px;font-weight:800;line-height:1.2}.sgst{display:flex;margin:10px 0 12px;gap:2px}.sgs{flex:1;text-align:center;font-size:11px;color:var(--mut,#80868b);position:relative}.sgs i{display:block;height:6px;border-radius:3px;background:var(--line);margin-bottom:5px}.sgs.done i,.sgs.cur i{background:var(--c)}.sgs.cur span{color:var(--c);font-weight:800}.sgs.done span{color:var(--fg)}'+
+'.sgst.np{display:block;padding:8px 10px;border-radius:10px;background:#80868b22;color:#5f6368;font-weight:700;font-size:14px}'+
+'#sg .sgbox{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin:8px 0}.sgdesc{font-size:15px;margin:4px 0}.sgdesc.big{font-size:17px;font-weight:600;margin:0 0 8px}'+
+'#sg .sgrow{display:flex;gap:10px;align-items:flex-start;padding:6px 0;border-top:1px solid var(--line)}#sg .sgrow>.ic{margin:2px 0 0;flex:none;color:var(--b)}'+
+'#sg .sgh{font-size:13px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--mut,#80868b);margin:16px 2px 4px}'+
+'#sg .sgform label{display:block;font-size:13px;font-weight:600;color:var(--mut,#80868b);margin:4px 0 8px}#sg .sgform select,#sg .sgform input{display:block;width:100%;box-sizing:border-box;margin-top:4px;font:inherit;font-size:16px;padding:11px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--fg)}#sg .sg2{display:grid;grid-template-columns:1fr 1fr;gap:8px}#sg select.need{border-color:#d93025;box-shadow:0 0 0 3px #d9302533}'+
+'#sg textarea{box-sizing:border-box}#sg .chips button .ic{width:16px;height:16px}'+
+'#sg .sgalert{background:#d9302518;color:#b3261e;border-radius:12px;padding:10px 12px;font-weight:600;font-size:14px;display:flex;gap:8px;align-items:center}'+
+'.sgtl{position:relative;margin:6px 0 10px}.sgi{display:flex;gap:12px;padding:8px 0;position:relative}.sgi:not(:last-child)::before{content:"";position:absolute;left:15px;top:38px;bottom:-6px;width:2px;background:var(--line)}.sgi>i{width:32px;height:32px;border-radius:16px;background:var(--c);color:#fff;display:flex;align-items:center;justify-content:center;flex:none}.sgi>i .ic{width:16px;height:16px;margin:0}.sgi b{font-size:15px}.sgi>div{min-width:0;flex:1}'+
+'#sg .sgacts a,#sg .sgacts button{display:inline-flex;align-items:center;gap:6px}#sg .sgacts .ic{margin:0;width:16px;height:16px}'+
+'.sgcard{cursor:pointer;padding:12px 0;border-bottom:1px solid var(--line)}.sgcard .h{display:flex;justify-content:space-between;align-items:center;gap:8px}.sgcard .sgst{margin:8px 0 6px}.sgcard .sgs span{font-size:10px}.sgmeta .ic{width:13px;height:13px;margin:0 2px 0 4px;vertical-align:-2px}.sgfoot{display:flex;justify-content:space-between;font-size:13px;color:var(--mut,#80868b);margin-top:4px}.sgfoot .ic{width:13px;height:13px;vertical-align:-2px}.sglast{font-size:13px;margin-top:6px;padding:6px 9px;border-radius:9px;background:var(--card);border:1px solid var(--line);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sglast .ic{width:13px;height:13px;vertical-align:-2px}'+
+'</style>');
+/* datos de ejemplo con seguimiento */
+(function(){if(S.prefs.demoSeg)return;S.prefs.demoSeg=1;const now=Date.now();S.caps.filter(k=>k.demo).forEach((k,i)=>{if(k.seg)return;const d=DEPS[[0,1,0,4,0,1,7,9,10,2,10,0,1,3,5][i%15]];
+ if(k.st==='pend'){k.et='rec';if(i%3===0)k.seg=[{ts:k.ts+36e5,tipo:'llamada',txt:'Se llamó a la vecina para confirmar la dirección',by:'Equipo de gestoría'}];return}
+ k.dep=d;k.resp=i%2?'Equipo de gestoría':'David de la Peña';if(i%4)k.fol='072-'+(41000+i*137);k.fc=new Date(now+(i%5-2)*864e5*3).toISOString().slice(0,10);
+ k.seg=[{ts:k.ts+2*36e5,tipo:'et',et:'can',txt:'A '+d+(k.fol?' · folio '+k.fol:''),by:k.resp}];
+ if(k.st==='gest'){k.et=i%2?'pro':'can';if(k.et==='pro')k.seg.push({ts:k.ts+864e5,tipo:'visita',txt:'Pasó la cuadrilla a revisar, quedan de regresar con material',by:k.resp},{ts:k.ts+864e5+6e4,tipo:'et',et:'pro',by:k.resp})}
+ else{k.et=i%2?'cer':'res';k.seg.push({ts:k.ts+864e5,tipo:'et',et:'pro',by:k.resp},{ts:k.ts+2*864e5,tipo:'et',et:'res',txt:'Quedó atendido, se tomó foto',by:k.resp});if(k.et==='cer')k.seg.push({ts:k.ts+2*864e5+36e5,tipo:'wa',txt:'Se avisó al ciudadano por WhatsApp, confirmó que quedó bien',by:k.resp},{ts:k.ts+2*864e5+37e5,tipo:'et',et:'cer',by:k.resp})}});save()})();
 
 /* ===== boot ===== */
 window.addEventListener('online',()=>{useTiles=true;tileFail=0;reqDraw()});window.addEventListener('offline',()=>{useTiles=false;reqDraw()});
