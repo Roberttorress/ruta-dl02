@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded',()=>deEmoji(document.body));
 
 'use strict';
 /* ===== data (injected) ===== */
-const BUILD='79e8e055',_D=window.__D;function dec(a){const o=[];let x=0,y=0;for(let k=0;k<a.length;k+=2){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5])}return o}const DAYS=_D.days.map(d=>{d.coords=dec(d.c);delete d.c;return d}),MERC=_D.merc,NT=_D.NT,OUTER=dec(_D.outer);const SECS=_D.secs.map(x=>{x.rings=x.r.map(dec);delete x.r;return x});const SEG=(()=>{const a=_D.seg,o=[];let x=0,y=0;for(let k=0;k<a.length;k+=4){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5,(x+a[k+2])/1e5,(y+a[k+3])/1e5])}return o})();delete window.__D;
+const BUILD='4e1dc4da',_D=window.__D;function dec(a){const o=[];let x=0,y=0;for(let k=0;k<a.length;k+=2){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5])}return o}const DAYS=_D.days.map(d=>{d.coords=dec(d.c);delete d.c;return d}),MERC=_D.merc,NT=_D.NT,OUTER=dec(_D.outer);const SECS=_D.secs.map(x=>{x.rings=x.r.map(dec);delete x.r;return x});const SEG=(()=>{const a=_D.seg,o=[];let x=0,y=0;for(let k=0;k<a.length;k+=4){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5,(x+a[k+2])/1e5,(y+a[k+3])/1e5])}return o})();delete window.__D;
 const DIAD='2027-06-06';
 const FN={1:'Fase 1 · Zona a favor',2:'Fase 2 · Zonas en empate',3:'Fase 3 · Zonas por recuperar'},CM={1:'#1d4f9c',2:'#1d4f9c',3:'#1d4f9c'};
 const CAT={FyC:{c:'#1d4f9c',n:'Ganó Fuerza y Corazón',s:'Fuerza y Corazón'},MC:{c:'#f07d00',n:'Ganó MC',s:'MC'},Morena:{c:'#8a1538',n:'Ganó Morena',s:'Morena'},PT:{c:'#d52b1e',n:'Ganó PT',s:'PT'},PVEM:{c:'#2e9d4f',n:'Ganó PVEM',s:'PVEM'},VIDA:{c:'#7b4fa0',n:'Ganó VIDA',s:'VIDA'}};SECS.forEach(x=>{x.cat0=x.cat;const v=[['FyC',x.fyc],['MC',x.mc],['Morena',x.mo],['PT',x.pt],['PVEM',x.pv],['VIDA',x.vi]].sort((a,b)=>b[1]-a[1]);x.cat=v[0][0];x.w2=v[1][0];x.mgv=v[0][1]-v[1][1];x.mg=x.tot?x.mgv/x.tot:0});
@@ -1036,7 +1036,7 @@ function sgWa(c){if(!c.tel)return null;const tel=c.tel.length===10?'52'+c.tel:c.
 petHtml=function(c){if(c.k!=='Petición')return _petHtml0(c);const e=etOf(c),age=dayN(Date.now()-c.ts),cerr=ETST[e]==='res',last=(c.seg||[]).filter(s=>s.tipo!=='et').slice(-1)[0];
  return '<div class="sgcard" data-id="'+c.id+'" data-open="1"><div class="h"><b>'+svgIc(CATI[c.cat]||'pin')+' '+esc(c.cat||'Gestoría')+(c.urg==='urgente'&&!cerr?' <span class="pill" style="background:#b3261e">URGENTE</span>':'')+(c.demo?' <span style="background:#80868b22;color:#5f6368;font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px;vertical-align:2px">PRUEBA</span>':'')+'</b><span class="stpill" style="background:'+ETC[e]+'">'+(e==='cer'?'Cerrada':ETN[e])+'</span></div>'+
  '<div class="sgdesc">'+esc(c.t||'')+'</div>'+(c.nom&&can('gestorias_datos')?'<div class="mut" style="font-size:13px">'+svgIc('user')+' '+esc(c.nom)+(c.tel?' · '+c.tel:'')+'</div>':'')+stepper(c)+
- '<div class="mut sgmeta">'+(c.sec?'Secc. '+pad(c.sec)+(gCol(c)?' · '+esc(gCol(c)):''):'')+(c.dep?' · '+esc(isTeam(c)?'Equipo':c.dep):'')+(c.resp?' · '+svgIc('user')+esc(c.resp):'')+'</div>'+
+ '<div class="mut sgmeta">'+(c.sec?'Secc. '+pad(c.sec)+(gCol(c)?' · '+esc(gCol(c)):''):'')+(c.dep?' · '+esc(isTeam(c)?'Equipo':c.dep):'')+(c.by?' · Recibió '+esc(c.by.split(' ')[0]):'')+(c.resp?' · Resuelve '+esc(c.resp.split(' ')[0]):'')+'</div>'+
  '<div class="sgfoot">'+(vencida(c)?'<b class="warn">Compromiso vencido</b>':c.fc&&!cerr?'Compromiso '+new Date(c.fc+'T12:00').toLocaleDateString('es-MX',{day:'numeric',month:'short'}):'')+(!cerr?'<span class="'+(age>=7?'warn':'')+'">'+age+' día'+(age===1?'':'s')+' abierta</span>':'<span>'+svgIc('check')+' '+((c.seg||[]).length)+' seguimientos</span>')+'</div>'+
  (last?'<div class="sglast">'+svgIc((SGT.find(t=>t[0]===last.tipo)||['','','pencil'])[2])+' '+esc(last.txt).slice(0,90)+'</div>':'')+'</div>'};
 const _bindPets0=bindPets;bindPets=function(root){root.querySelectorAll('.sgcard').forEach(el=>{const c=S.caps.find(x=>x.id===el.dataset.id);if(c)el.onclick=()=>openPet(c)});_bindPets0(root)};
@@ -1181,6 +1181,24 @@ const _openPet8=openPet;openPet=function(c){_openPet8(c);if(c.k!=='Petición'||!
   const old=document.getElementById('sgwa');if(old)old.remove()}
  else{d.innerHTML='<div class="mut" style="font-size:13px">'+svgIc('phone')+' Sin teléfono'+(c.ok===false&&c.nom?' (no dio permiso de contacto)':'')+'</div>';box.appendChild(d)}};
 document.head.insertAdjacentHTML('beforeend','<style>.sgcall{display:flex;gap:8px;margin-top:10px}.sgcall a{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;border-radius:12px;font-weight:700;font-size:16px;text-decoration:none;color:#fff}.sgcall .sgc1{background:#1d4f9c}.sgcall .sgc2{background:#1a9d2b}.sgcall .ic{width:20px;height:20px;margin:0}.sgcall .mut .ic{width:14px;height:14px;vertical-align:-2px}</style>');
+/* ===== Quién recibe y quién resuelve ===== */
+(function(){if(S.prefs.users3)return;S.prefs.users3=1;S.users=S.users||[];[['u_hdr','Héctor Del Real'],['u_rts','Roberto Torres']].forEach(([id,n])=>{if(!S.users.some(u=>u.n===n))S.users.push({id,n,rol:'c2',tel:'',pin:'',on:true})});
+ const T=['Héctor Del Real','Roberto Torres','David de la Peña'];S.caps.filter(k=>k.demo).forEach((k,i)=>{k.by=T[i%3];if(k.resp)k.resp=T[(i+1)%3];(k.seg||[]).forEach(s=>{if(s.by)s.by=k.resp||k.by})});save(true)})();
+const teamNames=()=>(S.users||[]).filter(u=>u.on).map(u=>u.n);
+let capBy=null;
+const _openCap8=openCap;openCap=function(kind){const u=curUser();capBy=u?u.n:(S.prefs.lastBy||'');_openCap8(kind)};
+const _capLocUI8=capLocUI;capLocUI=function(){_capLocUI8();const loc=document.getElementById('cloc');if(!loc||document.getElementById('cby'))return;const d=document.createElement('label');d.id='cby';
+ d.innerHTML='<span>¿Quién la recibe?</span><select id="cbysel"><option value="">— Elige —</option>'+teamNames().map(n=>'<option'+(n===capBy?' selected':'')+'>'+esc(n)+'</option>').join('')+'</select>';loc.after(d);$('cbysel').onchange=e=>{capBy=e.target.value}};
+const _saveCap8=saveCap;saveCap=async function(){const k=(document.querySelector('#mbox [data-kind].on')||{}).dataset;if(!capBy&&teamNames().length>1&&cap.k==='Petición'){const s=$('cbysel');if(s){s.classList.add('need');s.focus()}toast('Elige quién recibe la gestoría');return}
+ const n0=S.caps.length;await _saveCap8();if(S.caps.length>n0){const r=S.caps[S.caps.length-1];if(capBy){r.by=capBy;S.prefs.lastBy=capBy}save(true)}};
+meName=function(){const u=typeof curUser==='function'&&curUser();return u?u.n:(S.prefs.lastBy||'Equipo')};
+const _openPet9=openPet;openPet=function(c){_openPet9(c);if(c.k!=='Petición')return;const sg=document.getElementById('sg');if(!sg)return;
+ const hd=sg.querySelector('.sghd');if(hd){const r=document.createElement('div');r.className='sgwho';const f=new Date(c.ts).toLocaleString('es-MX',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+  r.innerHTML='<div>'+svgIc('inbox')+'<span><span class="mut">Recibió</span><b>'+esc(c.by||'Sin registro')+'</b><span class="mut">'+f+'</span></span></div><div>'+svgIc('user')+'<span><span class="mut">La resuelve</span><b'+(c.resp?'':' style="color:#d93025"')+'>'+esc(c.resp||'Sin asignar')+'</b>'+(c.dep&&c.dep!==TEAM?'<span class="mut">vía '+esc(c.dep)+'</span>':'')+'</span></div>';hd.after(r)}
+ const rs=document.getElementById('sgresp');if(rs){const lab=rs.closest('label');if(lab)lab.firstChild.textContent='¿Quién del equipo la va a resolver?';const opts=new Set([...teamNames(),c.resp].filter(Boolean));rs.innerHTML='<option value="">— Sin asignar —</option>'+[...opts].map(n=>'<option'+(n===c.resp?' selected':'')+'>'+esc(n)+'</option>').join('')}};
+const _gsRow9=gsRow;gsRow=function(c){const r=_gsRow9(c);return r};
+document.head.insertAdjacentHTML('beforeend','<style>#cby{display:flex;align-items:center;gap:10px;margin:0 0 10px;font-size:14px;font-weight:600}#cby span{flex:none}#cby select{flex:1;margin:0;padding:10px}#cby select.need{border-color:#d93025;box-shadow:0 0 0 3px #d9302533}'+
+'.sgwho{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 6px}.sgwho>div{display:flex;gap:8px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 10px}.sgwho>div>.ic{width:18px;height:18px;margin:2px 0 0;flex:none;color:var(--b)}.sgwho>div>span{display:flex;flex-direction:column;min-width:0;font-size:14px;line-height:1.3}.sgwho .mut{font-size:12px}</style>');
 
 /* ===== boot ===== */
 window.addEventListener('online',()=>{useTiles=true;tileFail=0;reqDraw()});window.addEventListener('offline',()=>{useTiles=false;reqDraw()});
