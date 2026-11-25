@@ -1,0 +1,20 @@
+const {chromium,devices}=require('playwright');(async()=>{const b=await chromium.launch();const errs=[];const U='file:///tmp/claude-0/-home-claude/9419e443-1d93-5159-8cb6-fedbd7344de5/scratchpad/out/site/index.html';const R=[];const ok=(n,v)=>R.push((v?'✅ ':'❌ ')+n);
+const ctx=await b.newContext({...devices['iPhone 15 Pro Max'],deviceScaleFactor:2,offline:true});await ctx.addInitScript(()=>{localStorage.setItem('dl02_ok','1')});
+const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));await p.goto(U);await p.waitForTimeout(1500);await p.evaluate(()=>{const u=document.getElementById('dvbub');if(u)u.style.display='none'});
+await p.click('#tabs button[data-t=cap]');await p.waitForTimeout(500);await p.screenshot({path:'../out/v30_lista.png',scale:'css'});
+const id=await p.evaluate(()=>S.caps.find(k=>k.demo&&k.et==='pro').id);await p.click('.sgcard[data-id="'+id+'"]');await p.waitForTimeout(500);await p.screenshot({path:'../out/v30_ficha.png',scale:'css'});
+await p.evaluate(()=>document.getElementById('mbox').scrollTop=2000);await p.waitForTimeout(200);await p.screenshot({path:'../out/v30_ficha2.png',scale:'css'});
+// nueva gestoría flujo
+const nid=await p.evaluate(()=>{const c={id:'t1',k:'Petición',cat:'Agua',t:'Fuga en la esquina',st:'pend',ts:Date.now(),sec:1595,urg:'normal',nom:'Ana',tel:'8112345678',lon:-100.3,lat:25.7};S.caps.push(c);save();closeModal();openPet(c);return c.id});await p.waitForTimeout(400);
+await p.click('#sgnext');await p.waitForTimeout(200);ok('canalizar pide dependencia',await p.evaluate(()=>S.caps.find(k=>k.id==='t1').et===undefined||S.caps.find(k=>k.id==='t1').et==='rec'));
+await p.selectOption('#sgdep','Equipo del candidato');await p.waitForTimeout(300);ok('al elegir equipo queda asignada',await p.evaluate(()=>S.caps.find(k=>k.id==='t1').et==='can'));
+ok('sin folio si es equipo',await p.evaluate(()=>!document.getElementById('sgfol')));
+await p.click('#sgtipos button[data-t=llamada]');await p.fill('#sgtxt','Se llamó a AyD, vienen el jueves');await p.click('#sgadd');await p.waitForTimeout(300);
+ok('seguimiento guardado',await p.evaluate(()=>S.caps.find(k=>k.id==='t1').seg.some(s=>s.tipo==='llamada')));
+await p.click('#sgnext');await p.waitForTimeout(300);ok('en proceso',await p.evaluate(()=>S.caps.find(k=>k.id==='t1').et==='pro'&&S.caps.find(k=>k.id==='t1').st==='gest'));
+p.once('dialog',d=>d.accept('Se cambió la tubería'));await p.click('#sgnext');await p.waitForTimeout(300);ok('resuelta',await p.evaluate(()=>S.caps.find(k=>k.id==='t1').st==='res'));
+await p.click('#sgnext');await p.waitForTimeout(300);ok('cerrada',await p.evaluate(()=>S.caps.find(k=>k.id==='t1').et==='cer'));
+ok('historial',await p.evaluate(()=>document.querySelectorAll('.sgtl .sgi').length>=6));await p.screenshot({path:'../out/v30_flujo.png',scale:'css'});
+await p.click('#sgclose');await p.waitForTimeout(400);
+const x=await p.evaluate(async()=>{let blob;const o=window.shareBlob;window.shareBlob=(n,bl)=>{blob=bl};try{gestXlsx()}catch(e){return 'err '+e.message}window.shareBlob=o;return blob?blob.size:'nob'});ok('excel '+x,typeof x==='number');
+console.log(R.join('\n'));console.log('errs',errs);await b.close()})();

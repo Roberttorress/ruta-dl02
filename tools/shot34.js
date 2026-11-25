@@ -1,0 +1,7 @@
+const {chromium,devices}=require('playwright');(async()=>{const b=await chromium.launch();const errs=[];const U='file:///tmp/claude-0/-home-claude/9419e443-1d93-5159-8cb6-fedbd7344de5/scratchpad/out/site/index.html';
+const ctx=await b.newContext({...devices['iPhone 15 Pro Max'],deviceScaleFactor:2,offline:true});await ctx.addInitScript(()=>{localStorage.setItem('dl02_ok','1')});
+const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));await p.goto(U);await p.waitForTimeout(1500);
+await p.evaluate(()=>{const c={id:'t9',k:'Petición',cat:'Agua',t:'Sin agua desde el lunes en toda la cuadra',st:'gest',et:'can',dep:'Equipo del candidato',resp:'Equipo de gestoría',ts:Date.now()-3*864e5,sec:1595,urg:'urgente',nom:'María López',tel:'8112345678',ok:true,dir:'Calle Nardo 6037',lon:-100.33,lat:25.71};S.caps.push(c);save();openPet(c)});await p.waitForTimeout(400);
+await p.evaluate(()=>document.getElementById('sgcall').addEventListener('click',e=>e.preventDefault()));await p.click('#sgcall');await p.waitForTimeout(300);
+console.log('log',await p.evaluate(()=>S.caps.find(k=>k.id==='t9').seg.map(s=>s.tipo).join(',')),'tipo',await p.evaluate(()=>sgTipo));
+await p.screenshot({path:'../out/v35_ficha.png',scale:'css'});await p.evaluate(()=>{closeModal();openCap()});await p.waitForTimeout(500);await p.screenshot({path:'../out/v35_cap.png',scale:'css'});console.log('users',await p.evaluate(()=>S.users.map(u=>u.n).join(', ')));console.log('errs',errs);await b.close()})();

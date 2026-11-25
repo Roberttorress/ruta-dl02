@@ -1,0 +1,15 @@
+const {chromium,devices}=require('playwright');(async()=>{const b=await chromium.launch();const errs=[];
+const ctx=await b.newContext({...devices['iPhone 15 Pro Max'],deviceScaleFactor:2,offline:true});await ctx.addInitScript(()=>{localStorage.setItem('dl02_ok','1')});
+const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));await p.goto('file:///tmp/claude-0/-home-claude/9419e443-1d93-5159-8cb6-fedbd7344de5/scratchpad/out/site/index.html');await p.waitForTimeout(1500);
+await p.evaluate(()=>{const u=document.getElementById('dvbub');if(u)u.style.display='none';const now=Date.now(),x=SB[1595],c=x.rings[0].reduce((a,q)=>[a[0]+q[0],a[1]+q[1]],[0,0]).map(v=>v/x.rings[0].length);
+ [['Agua','pend','urgente','Sin agua desde el lunes en toda la cuadra','María López','Calle Nardo 6037',0,0],['Alumbrado','gest','normal','Tres lámparas apagadas frente a la primaria','José Ruiz','Av. Solidaridad 6659',.0015,.001],['Pavimento','res','normal','Bache grande en la esquina, ya lo taparon','Ana Pérez','Jacaranda 5200',-.0012,.0008],['Seguridad','pend','normal','Piden patrullaje por las tardes','Luis Gómez','Río Nilo 225',.0008,-.0012]].forEach((a,i)=>S.caps.push({id:'s'+i,k:'Petición',cat:a[0],st:a[1],urg:a[2],t:a[3],nom:a[4],tel:'811234567'+i,ok:true,dir:a[5],ts:now-i*2*864e5,sec:1595,col:'DEL MAESTRO',lon:c[0]+a[6],lat:c[1]+a[7],hist:a[1]==='res'?[{st:'res',ts:now}]:[]}));save(true)});
+await p.click('#tabs button[data-t=cap]');await p.waitForTimeout(500);await p.screenshot({path:'../out/v27_lista.png',scale:'css'});
+await p.click('#tabs button[data-t=hoy]');await p.evaluate(()=>{const x=SB[1595],c=x.rings[0].reduce((a,q)=>[a[0]+q[0],a[1]+q[1]],[0,0]).map(v=>v/x.rings[0].length);view.lon=c[0];view.lat=c[1];view.z=16.6;reqDraw();__sheet('min')});await p.waitForTimeout(900);await p.screenshot({path:'../out/v27_mapa.png',scale:'css'});
+await p.evaluate(()=>openPet(S.caps.find(k=>k.id==='s1')));await p.waitForTimeout(400);await p.screenshot({path:'../out/v27_ficha.png',scale:'css'});
+await p.click('#mclose').catch(()=>{});await p.waitForTimeout(400);
+const tp=await p.evaluate(()=>{const h=gHits[gHits.length-1];return h?[(h[0]+h[2])/2,(h[1]+h[3])/2,gHits.length]:null});console.log('hits',tp);
+const r=await p.evaluate(()=>{const b=cv.getBoundingClientRect();return [b.left,b.top]});await p.mouse.click(r[0]+tp[0],r[1]+tp[1]);await p.waitForTimeout(500);console.log('modal',await p.evaluate(()=>getComputedStyle(document.getElementById('modal')).display));
+const ip=await b.newContext({...devices['iPad Pro 11 landscape'],offline:true});await ip.addInitScript(()=>{localStorage.setItem('dl02_ok','1')});const q=await ip.newPage();q.on('pageerror',e=>errs.push(e.message));
+await q.goto('file:///tmp/claude-0/-home-claude/9419e443-1d93-5159-8cb6-fedbd7344de5/scratchpad/out/site/index.html');await q.waitForTimeout(1200);
+const st=await p.evaluate(()=>JSON.stringify(S.caps));await q.evaluate(c=>{S.caps=JSON.parse(c);save(true);openMaestra()},st);await q.waitForTimeout(1200);await q.screenshot({path:'../out/v27_mae.png'});
+console.log('errs',errs);await b.close()})();
