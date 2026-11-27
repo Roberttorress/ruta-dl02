@@ -16,7 +16,7 @@ js = open('app3.js').read()
 _svg = re.sub(r'<!--.*?-->', '', open('mascot.svg').read()).replace('\n', '')
 _org = open('org.js').read().replace("window.__DVSVG||''", J(_svg))
 js = open('icons.js').read() + '\n' + js
-js = js.replace('/* ===== boot ===== */', _org + '\n' + open('dd.js').read() + '\n' + open('fis.js').read() + '\n' + open('v5.js').read() + '\n' + open('v6.js').read() + '\n' + open('v7.js').read() + '\n' + open('v8.js').read() + '\n/* ===== boot ===== */')
+js = js.replace('/* ===== boot ===== */', _org + '\n' + open('dd.js').read() + '\n' + open('fis.js').read() + '\n' + open('v5.js').read() + '\n' + open('v6.js').read() + '\n' + open('v7.js').read() + '\n' + open('v8.js').read() + '\n' + open('v9.js').read() + '\n/* ===== boot ===== */')
 js = js.replace('({hoy:rHoy,cal:rCal,av:rAv,cap:rCap,mas:rMas})[tab]()', '({hoy:rHoy,cal:rAg,dd:rDD,av:rAv,cap:rCap,mas:rMas})[tab]()')
 assert 'dd:rDD' in js
 js = js.replace("[tab]();panel.scrollTop=0}", "[tab]();panel.scrollTop=0;tabAnim()}", 1)
