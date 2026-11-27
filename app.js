@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded',()=>deEmoji(document.body));
 
 'use strict';
 /* ===== data (injected) ===== */
-const BUILD='6475d611',_D=window.__D;function dec(a){const o=[];let x=0,y=0;for(let k=0;k<a.length;k+=2){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5])}return o}const DAYS=_D.days.map(d=>{d.coords=dec(d.c);delete d.c;return d}),MERC=_D.merc,NT=_D.NT,OUTER=dec(_D.outer);const SECS=_D.secs.map(x=>{x.rings=x.r.map(dec);delete x.r;return x});const SEG=(()=>{const a=_D.seg,o=[];let x=0,y=0;for(let k=0;k<a.length;k+=4){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5,(x+a[k+2])/1e5,(y+a[k+3])/1e5])}return o})();delete window.__D;
+const BUILD='8564cb95',_D=window.__D;function dec(a){const o=[];let x=0,y=0;for(let k=0;k<a.length;k+=2){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5])}return o}const DAYS=_D.days.map(d=>{d.coords=dec(d.c);delete d.c;return d}),MERC=_D.merc,NT=_D.NT,OUTER=dec(_D.outer);const SECS=_D.secs.map(x=>{x.rings=x.r.map(dec);delete x.r;return x});const SEG=(()=>{const a=_D.seg,o=[];let x=0,y=0;for(let k=0;k<a.length;k+=4){x+=a[k];y+=a[k+1];o.push([x/1e5,y/1e5,(x+a[k+2])/1e5,(y+a[k+3])/1e5])}return o})();delete window.__D;
 const DIAD='2027-06-06';
 const FN={1:'Fase 1 · Zona a favor',2:'Fase 2 · Zonas en empate',3:'Fase 3 · Zonas por recuperar'},CM={1:'#1d4f9c',2:'#1d4f9c',3:'#1d4f9c'};
 const CAT={FyC:{c:'#1d4f9c',n:'Ganó Fuerza y Corazón',s:'Fuerza y Corazón'},MC:{c:'#f07d00',n:'Ganó MC',s:'MC'},Morena:{c:'#8a1538',n:'Ganó Morena',s:'Morena'},PT:{c:'#d52b1e',n:'Ganó PT',s:'PT'},PVEM:{c:'#2e9d4f',n:'Ganó PVEM',s:'PVEM'},VIDA:{c:'#7b4fa0',n:'Ganó VIDA',s:'VIDA'}};SECS.forEach(x=>{x.cat0=x.cat;const v=[['FyC',x.fyc],['MC',x.mc],['Morena',x.mo],['PT',x.pt],['PVEM',x.pv],['VIDA',x.vi]].sort((a,b)=>b[1]-a[1]);x.cat=v[0][0];x.w2=v[1][0];x.mgv=v[0][1]-v[1][1];x.mg=x.tot?x.mgv/x.tot:0});
@@ -1209,6 +1209,20 @@ function loginGate(){if(curUser()||navigator.webdriver||window.MAE)return;const 
  const x=$('mclose');if(x)x.style.visibility='hidden';const ob=new MutationObserver(()=>{if(getComputedStyle($('modal')).display==='none'){if(x)x.style.visibility='';ob.disconnect();if(!curUser())setTimeout(loginGate,300)}});ob.observe($('modal'),{attributes:true,attributeFilter:['style']})}
 setTimeout(loginGate,900);
 document.head.insertAdjacentHTML('beforeend','<style>#cby2{display:flex;align-items:center;gap:8px;font-size:14px;margin:0 0 10px;padding:0 2px}#cby2 .ic{width:16px;height:16px;margin:0;color:var(--b)}</style>');
+
+/* ===== Fiscalización aparte: Eventos y SIF, Gastos y tope, Ajustes · solo candidato (C1) y administradores (C2) ===== */
+function fzBoss(){const u=curUser();if(!u)return !S.users.some(x=>x.on&&x.pin);return u.rol==='c1'||u.rol==='c2'}
+agSegH=function(){if(agSeg==='rec')return '<h1>Agenda</h1>';
+ return '<h1>Fiscalización</h1><div class="mut" style="margin:-4px 0 8px">🔒 Solo candidato y administradores</div><div class="chips">'+[['ev','📅 Eventos y SIF'],['g','💰 Gastos y tope'],['cfg','⚙️ Ajustes']].map(a=>'<button data-ag="'+a[0]+'" class="'+(agSeg===a[0]?'on':'')+'">'+a[1]+'</button>').join('')+'</div>'};
+const _rAg9=rAg;rAg=function(){if(agSeg!=='rec'&&!fzBoss())agSeg='rec';_rAg9()};
+function openFis(seg){if(!fzBoss())return;agSeg=seg||'ev';evFil='prox';tab='cal';render()}
+/* el botón Agenda de abajo siempre abre Recorridos */
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#tabs button[data-t="cal"]');if(b)agSeg='rec'},true);
+/* acceso desde Más */
+const _rMas9=rMas;rMas=function(){_rMas9();if(!fzBoss())return;const m=document.getElementById('mmae');const b=document.createElement('button');b.className='btn sec';b.id='mfis';b.textContent='🧾 Fiscalización: eventos SIF y gastos';b.onclick=()=>openFis('ev');
+ if(m)m.after(b);else panel.prepend(b)};
+/* permisos: tarjeta de fiscalización en Hoy y acceso desde el asistente, solo C1/C2 */
+PRULES.push(['.fzhoy',()=>fzBoss()],['.chips [data-v=ag]',()=>fzBoss()]);
 
 /* ===== boot ===== */
 window.addEventListener('online',()=>{useTiles=true;tileFail=0;reqDraw()});window.addEventListener('offline',()=>{useTiles=false;reqDraw()});
